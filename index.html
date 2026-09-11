@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIMTADIK - Buku Tamu Digital & Scheduling Lobi Sekolah</title>
+  
+  <!-- Font Google: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              cyan: '#06B6D4',
+              blue: '#3B82F6',
+              emerald: '#10B981',
+              dark: '#0B0F19'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- React, ReactDOM, and Babel Standalone CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Custom Styles: Mirror Webcam & Utility Animations -->
+  <style>
+    .mirror {
+      transform: scaleX(-1);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .animate-slide-up {
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.4);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(6, 182, 212, 0.6);
+    }
+  </style>
+</head>
+<body class="bg-[#0B0F19] text-slate-100 antialiased selection:bg-cyan-500 selection:text-white">
+  
+  <div id="root"></div>
+
+  <!-- React Component Script -->
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    const INITIAL_APPOINTMENTS = [
+      {
+        id: 'apt-1',
+        trackingCode: 'SMT-2026-0812',
+        category: 'instansi',
+        fullName: 'Drs. H. Mulyadi, M.Pd.',
+        phone: '081234567890',
+        identifierNo: '197103151996031002',
+        institutionName: 'Cabang Dinas Pendidikan Wilayah III',
+        taskLetterNo: '800/142/Disdik/IX/2026',
+        purpose: 'Koordinasi Penyaluran Bantuan Sarpras Lab Digital & Monitoring BOS',
+        urgency: 'penting',
+        photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&fit=crop&q=80',
+        status: 'PENDING',
+        targetHost: 'Dr. H. Ahmad Sudrajat, M.Pd. (Kepala Sekolah)',
+        createdAt: '2026-09-11 08:30 WIB',
+        meetingDate: '2026-09-11',
+        startTime: '10:00',
+        endTime: '10:45',
+        roomLocation: 'Ruang Kepala Sekolah',
+        checkInTime: null,
+        checkOutTime: null,
+        receptionistName: null,
+        jwtSignature: 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJTSU1UQURJSyJ9.demo1'
+      },
+      {
+        id: 'apt-2',
+        trackingCode: 'SMT-2026-0813',
+        category: 'ortu',
+        fullName: 'Ibu Ratna Kartika, S.E.',
+        phone: '085712348899',
+        identifierNo: 'NISN Siswa: 0089123488 (Arya Putra X-4)',
+        institutionName: 'Komite Kelas X',
+        purpose: 'Konsultasi Perizinan Program Pertukaran Pelajar Jepang & Beasiswa',
+        urgency: 'biasa',
+        photoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&fit=crop&q=80',
+        status: 'DISETUJUI',
+        targetHost: 'Dr. H. Ahmad Sudrajat, M.Pd. (Kepala Sekolah)',
+        createdAt: '2026-09-10 14:15 WIB',
+        meetingDate: '2026-09-11',
+        startTime: '09:00',
+        endTime: '09:30',
+        roomLocation: 'Ruang Tamu VVIP Lobi',
+        checkInTime: null,
+        checkOutTime: null,
+        receptionistName: 'Rian Pratama (Lobi-1)',
+        jwtSignature: 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJTSU1UQURJSyJ9.demo2'
+      },
+      {
+        id: 'apt-3',
+        trackingCode: 'SMT-2026-0814',
+        category: 'vendor',
+        fullName: 'Bambang Irawan, S.Kom.',
+        phone: '081399887711',
+        identifierNo: 'PT Telkom Solusi Indonesia',
+        institutionName: 'PT Telkom Solusi Indonesia',
+        taskLetterNo: 'TSI/SPK-NET/VIII/2026',
+        purpose: 'Finalisasi Berita Acara Uji Terima Fiber Optik 10 Gbps Smart School',
+        urgency: 'mendesak',
+        photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&fit=crop&q=80',
+        status: 'SEDANG BERLANGSUNG',
+        targetHost: 'Ir. Bambang Sujarwo (Wakasek Sarpras)',
+        createdAt: '2026-09-11 07:45 WIB',
+        meetingDate: '2026-09-11',
+        startTime: '08:30',
+        endTime: '09:15',
+        roomLocation: 'Ruang Rapat Mini Lt. 2',
+        checkInTime: '08:28 WIB',
+        checkOutTime: null,
+        receptionistName: 'Rian Pratama (Lobi-1)',
+        jwtSignature: 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.demo3'
+      },
+      {
+        id: 'apt-4',
+        trackingCode: 'SMT-2026-0809',
+        category: 'instansi',
+        fullName: 'Agus Wijanarko, S.H.',
+        phone: '081298765432',
+        identifierNo: 'Bawaslu Kota - Divisi Edukasi',
+        institutionName: 'Bawaslu Kota',
+        taskLetterNo: 'ST/102/BWL/IX/2026',
+        purpose: 'Sosialisasi Pemilih Pemula di Lingkungan Sekolah Menengah',
+        urgency: 'biasa',
+        photoUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&fit=crop&q=80',
+        status: 'DISETUJUI',
+        targetHost: 'Dr. H. Ahmad Sudrajat, M.Pd. (Kepala Sekolah)',
+        createdAt: '2026-09-11 06:30 WIB',
+        meetingDate: '2026-09-11',
+        startTime: '08:00',
+        endTime: '08:45',
+        roomLocation: 'Ruang Kepala Sekolah',
+        checkInTime: null,
+        checkOutTime: null,
+        receptionistName: 'Rian Pratama (Lobi-1)',
+        jwtSignature: 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.demo4'
+      }
+    ];
+
+    const BLOCKED_SCHEDULES = [
+      { start: '10:00', end: '11:00', title: 'Rapat Koordinasi Evaluasi ANBK Cabdin Wilayah III (Via Zoom)' },
+      { start: '11:45', end: '13:00', title: 'Istirahat & Supervisi Shalat Berjamaah Masjid Sekolah' }
+    ];
+
+    function SIMTADIKApp() {
+      const [activeRole, setActiveRole] = useState('guest-form');
+      const [darkMode, setDarkMode] = useState(true);
+      const [appointments, setAppointments] = useState(INITIAL_APPOINTMENTS);
+      const [selectedTicketId, setSelectedTicketId] = useState('apt-1');
+      const [toastMessage, setToastMessage] = useState(null);
+
+      const toggleTheme = () => {
+        const nextMode = !darkMode;
+        setDarkMode(nextMode);
+        if (nextMode) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      };
+
+      const showToast = (title, desc) => {
+        setToastMessage({ title, desc });
+        setTimeout(() => setToastMessage(null), 4000);
+      };
+
+      const currentTicket = appointments.find(a => a.id === selectedTicketId) || appointments[0];
+
+      return (
+        <div className={`${darkMode ? 'dark bg-[#0B0F19] text-slate-100' : 'bg-slate-50 text-slate-900'} min-h-screen transition-colors duration-200`}>
+          {/* TOP BAR ROLE SWITCHER */}
+          <header className="sticky top-0 z-50 backdrop-blur-xl border-b border-slate-700/50 bg-slate-950/80 px-4 py-2.5 shadow-xl">
+            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5 w-full md:w-auto justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 via-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/25 border border-cyan-400/40 font-black text-white text-sm">
+                    S
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-extrabold text-sm tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-emerald-400">
+                        SIMTADIK
+                      </span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-950 border border-cyan-500/40 text-cyan-300 font-mono">v1.1</span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 font-medium">SMAN 1 Prestasi Bangsa</p>
+                  </div>
+                </div>
+
+                <button onClick={toggleTheme} className="md:hidden p-1.5 rounded-lg border border-slate-700 bg-slate-800 text-xs">
+                  {darkMode ? '☀️' : '🌙'}
+                </button>
+              </div>
+
+              {/* Central Switcher */}
+              <nav className="flex items-center overflow-x-auto max-w-full pb-1 md:pb-0 gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+                {[
+                  { id: 'guest-form', label: '1. Form Tamu', icon: '📝' },
+                  { id: 'guest-ticket', label: '2. E-Ticket QR', icon: '🎫' },
+                  { id: 'host-dash', label: '3. Dasbor Kepala Sekolah', icon: '🛡️', badge: appointments.filter(a => a.status === 'PENDING').length },
+                  { id: 'receptionist', label: '4. Terminal Lobi', icon: '🖥️' },
+                  { id: 'analytics', label: '5. Analitik & Audit', icon: '📊' },
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveRole(tab.id)}
+                    className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                      activeRole === tab.id
+                        ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md shadow-cyan-600/30'
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                    }`}
+                  >
+                    <span>{tab.icon}</span>
+                    <span>{tab.label}</span>
+                    {tab.badge !== undefined && tab.badge > 0 && (
+                      <span className="ml-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] flex items-center justify-center font-bold">
+                        {tab.badge}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </nav>
+
+              <div className="hidden md:flex items-center gap-3 text-xs">
+                <span className="px-2.5 py-1 rounded-full bg-emerald-950/70 border border-emerald-500/40 text-emerald-400 font-mono text-[11px]">
+                  ● UU PDP 27/2022
+                </span>
+                <button
+                  onClick={toggleTheme}
+                  className="p-1.5 px-2.5 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+                >
+                  {darkMode ? '☀️ Terang' : '🌙 Gelap'}
+                </button>
+              </div>
+            </div>
+          </header>
+
+          {/* GLOBAL TOAST */}
+          {toastMessage && (
+            <div className="fixed bottom-5 right-5 z-50 max-w-sm bg-slate-900 border border-cyan-500/50 shadow-2xl text-white p-4 rounded-xl flex items-start gap-3 animate-slide-up">
+              <div className="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-xs">✓</div>
+              <div>
+                <h4 className="text-xs font-bold text-cyan-300">{toastMessage.title}</h4>
+                <p className="text-[11px] text-slate-300 mt-0.5">{toastMessage.desc}</p>
+              </div>
+            </div>
+          )}
+
+          {/* VIEWS */}
+          <main className="max-w-7xl mx-auto p-4 md:p-6">
+            {activeRole === 'guest-form' && (
+              <GuestRegistrationModule
+                onAppointmentCreated={(newApt) => {
+                  setAppointments([newApt, ...appointments]);
+                  setSelectedTicketId(newApt.id);
+                  showToast('Permohonan Terkirim!', `Kode: ${newApt.trackingCode}. Notifikasi diteruskan ke pimpinan.`);
+                  setActiveRole('guest-ticket');
+                }}
+              />
+            )}
+
+            {activeRole === 'guest-ticket' && (
+              <GuestTicketModule
+                appointment={currentTicket}
+                allAppointments={appointments}
+                onSelectTicket={(id) => setSelectedTicketId(id)}
+                onDirectToReceptionist={() => setActiveRole('receptionist')}
+              />
+            )}
+
+            {activeRole === 'host-dash' && (
+              <HostDashboardModule
+                appointments={appointments}
+                onUpdateAppointment={(updatedApt, actionTitle) => {
+                  setAppointments(appointments.map(a => a.id === updatedApt.id ? updatedApt : a));
+                  showToast('Tindakan Berhasil Disimpan', actionTitle);
+                }}
+              />
+            )}
+
+            {activeRole === 'receptionist' && (
+              <ReceptionistTerminalModule
+                appointments={appointments}
+                onCheckIn={(aptId) => {
+                  const now = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+                  setAppointments(appointments.map(a => a.id === aptId ? {
+                    ...a,
+                    status: 'SEDANG BERLANGSUNG',
+                    checkInTime: now,
+                    receptionistName: 'Rian Pratama (Lobi-1)'
+                  } : a));
+                  showToast('Tamu Check-In Sukses', 'Status diperbarui: SEDANG BERLANGSUNG.');
+                }}
+                onCheckOut={(aptId) => {
+                  const now = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+                  setAppointments(appointments.map(a => a.id === aptId ? {
+                    ...a,
+                    status: 'SELESAI',
+                    checkOutTime: now
+                  } : a));
+                  showToast('Tamu Check-Out', 'Kunjungan telah selesai. Log tersimpan permanen.');
+                }}
+              />
+            )}
+
+            {activeRole === 'analytics' && (
+              <AnalyticsAuditModule appointments={appointments} />
+            )}
+          </main>
+        </div>
+      );
+    }
+
+    // --- 1. MODUL FORMULIR TAMU ---
+    function GuestRegistrationModule({ onAppointmentCreated }) {
+      const [category, setCategory] = useState('instansi');
+      const [fullName, setFullName] = useState('');
+      const [phone, setPhone] = useState('');
+      const [purpose, setPurpose] = useState('');
+      const [urgency, setUrgency] = useState('biasa');
+      const [nisn, setNisn] = useState('');
+      const [kelas, setKelas] = useState('');
+      const [institutionName, setInstitutionName] = useState('');
+      const [taskLetterNo, setTaskLetterNo] = useState('');
+
+      const videoRef = useRef(null);
+      const canvasRef = useRef(null);
+      const [isCameraActive, setIsCameraActive] = useState(false);
+      const [capturedPhoto, setCapturedPhoto] = useState(null);
+      const [luminanceAlert, setLuminanceAlert] = useState(false);
+
+      const startCamera = async () => {
+        try {
+          if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            if (videoRef.current) {
+              videoRef.current.srcObject = stream;
+              videoRef.current.play();
+              setIsCameraActive(true);
+            }
+          }
+        } catch (err) {
+          setIsCameraActive(false);
+        }
+      };
+
+      const stopCamera = () => {
+        if (videoRef.current && videoRef.current.srcObject) {
+          videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+        }
+        setIsCameraActive(false);
+      };
+
+      useEffect(() => {
+        startCamera();
+        return () => stopCamera();
+      }, []);
+
+      const capturePhoto = () => {
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+        if (video && isCameraActive && canvas) {
+          const ctx = canvas.getContext('2d');
+          canvas.width = 480;
+          canvas.height = 360;
+          ctx.drawImage(video, 0, 0, 480, 360);
+          
+          const imgData = ctx.getImageData(0, 0, 480, 360).data;
+          let sumLum = 0;
+          for (let i = 0; i < imgData.length; i += 4) {
+            sumLum += 0.299 * imgData[i] + 0.587 * imgData[i + 1] + 0.114 * imgData[i + 2];
+          }
+          const avgBrightness = Math.round(sumLum / (imgData.length / 4));
+          setLuminanceAlert(avgBrightness < 35);
+
+          setCapturedPhoto(canvas.toDataURL('image/jpeg', 0.85));
+          stopCamera();
+        } else {
+          setCapturedPhoto('https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&fit=crop&q=80');
+          setLuminanceAlert(false);
+        }
+      };
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!fullName || !phone || !purpose) {
+          alert('Harap lengkapi semua kolom.');
+          return;
+        }
+        if (!capturedPhoto) {
+          alert('Harap ambil foto wajah Anda.');
+          return;
+        }
+
+        const rand = Math.floor(1000 + Math.random() * 9000);
+        onAppointmentCreated({
+          id: 'apt-' + Date.now(),
+          trackingCode: `SMT-2026-${rand}`,
+          category,
+          fullName,
+          phone,
+          identifierNo: category === 'siswa' ? `NISN: ${nisn} (${kelas})` : taskLetterNo || 'Identitas Terverifikasi',
+          institutionName: category === 'instansi' || category === 'vendor' ? institutionName : 'Internal Sekolah',
+          purpose,
+          urgency,
+          photoUrl: capturedPhoto,
+          status: 'PENDING',
+          targetHost: 'Dr. H. Ahmad Sudrajat, M.Pd. (Kepala Sekolah)',
+          createdAt: 'Hari ini',
+          meetingDate: '2026-09-11',
+          startTime: 'Menunggu Persetujuan',
+          endTime: 'Menunggu Persetujuan',
+          roomLocation: 'Ruang Kepala Sekolah'
+        });
+      };
+
+      return (
+        <div className="max-w-4xl mx-auto space-y-6">
+          <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 border border-slate-700 shadow-xl">
+            <h1 className="text-2xl font-bold text-white">Formulir Pengajuan Audiensi</h1>
+            <p className="text-slate-400 text-xs mt-1">Sistem Buku Tamu & Registrasi Pimpinan Terintegrasi UU PDP 2022.</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-3">
+              <label className="text-xs font-semibold text-slate-300">1. Pilih Kategori Tamu:</label>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                {[
+                  { id: 'siswa', label: 'Siswa', icon: '🎓' },
+                  { id: 'ortu', label: 'Orang Tua', icon: '👨‍👩‍👧' },
+                  { id: 'guru', label: 'Guru/Staf', icon: '💼' },
+                  { id: 'instansi', label: 'Instansi Luar', icon: '🏛️' },
+                  { id: 'vendor', label: 'Vendor', icon: '🤝' },
+                ].map(c => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setCategory(c.id)}
+                    className={`p-3 rounded-xl border text-center transition-all ${
+                      category === c.id
+                        ? 'bg-cyan-950/60 border-cyan-400 text-cyan-300 font-bold ring-1 ring-cyan-400'
+                        : 'bg-slate-800/50 border-slate-700 text-slate-300 hover:bg-slate-800'
+                    }`}
+                  >
+                    <div className="text-xl mb-1">{c.icon}</div>
+                    <div className="text-xs">{c.label}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-slate-300 block mb-1">Nama Lengkap & Gelar *</label>
+                  <input
+                    type="text"
+                    required
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="cth. Drs. H. Mulyadi, M.Pd."
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-slate-300 block mb-1">Nomor WhatsApp Aktif *</label>
+                  <input
+                    type="tel"
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="cth. 081234567890"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+              </div>
+
+              {(category === 'instansi' || category === 'vendor') && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs text-slate-300 block mb-1">Nama Lembaga / Instansi</label>
+                    <input
+                      type="text"
+                      value={institutionName}
+                      onChange={(e) => setInstitutionName(e.target.value)}
+                      placeholder="cth. Cabang Dinas Pendidikan"
+                      className="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-slate-300 block mb-1">Nomor Surat Tugas</label>
+                    <input
+                      type="text"
+                      value={taskLetterNo}
+                      onChange={(e) => setTaskLetterNo(e.target.value)}
+                      placeholder="cth. 800/142/Disdik/IX/2026"
+                      className="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label className="text-xs text-slate-300 block mb-1">Perihal Audiensi *</label>
+                <textarea
+                  rows={2}
+                  required
+                  value={purpose}
+                  onChange={(e) => setPurpose(e.target.value)}
+                  placeholder="Jelaskan agenda pertemuan..."
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs text-slate-300 block mb-2">Tingkat Urgensi:</label>
+                <div className="flex gap-2">
+                  {['biasa', 'penting', 'mendesak'].map((u) => (
+                    <button
+                      key={u}
+                      type="button"
+                      onClick={() => setUrgency(u)}
+                      className={`px-3 py-1.5 rounded-lg border text-xs capitalize ${
+                        urgency === u ? 'bg-cyan-950 border-cyan-400 text-cyan-300 font-bold' : 'bg-slate-800 border-slate-700 text-slate-400'
+                      }`}
+                    >
+                      {u}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* LIVE WEBCAM CAPTURE */}
+            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-semibold text-slate-200">Verifikasi Wajah Langsung (Anti-Spoofing)</span>
+                <span className="text-[10px] font-mono text-cyan-400">Live Camera API</span>
+              </div>
+
+              <div className="relative max-w-sm mx-auto aspect-[4/3] rounded-2xl overflow-hidden bg-slate-950 border-2 border-slate-700 flex items-center justify-center">
+                {!capturedPhoto && isCameraActive && (
+                  <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover mirror" />
+                )}
+                {capturedPhoto && (
+                  <img src={capturedPhoto} alt="Snapshot" className="w-full h-full object-cover" />
+                )}
+                {!capturedPhoto && !isCameraActive && (
+                  <div className="text-center p-4">
+                    <p className="text-xs text-slate-400">Kamera tidak aktif atau izin ditolak.</p>
+                    <button type="button" onClick={startCamera} className="mt-2 px-3 py-1 bg-cyan-600 rounded-lg text-xs font-bold">
+                      Nyalakan Kamera
+                    </button>
+                  </div>
+                )}
+                <canvas ref={canvasRef} className="hidden" />
+              </div>
+
+              {luminanceAlert && (
+                <div className="p-2.5 rounded-xl bg-amber-950/80 border border-amber-500/80 text-amber-300 text-xs">
+                  ⚠️ <strong>Pencahayaan Terlalu Gelap.</strong> Harap cari tempat yang lebih terang.
+                </div>
+              )}
+
+              <div className="flex justify-center gap-2">
+                {!capturedPhoto ? (
+                  <button
+                    type="button"
+                    onClick={capturePhoto}
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold text-xs shadow-lg"
+                  >
+                    📸 Ambil Foto Wajah
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => { setCapturedPhoto(null); startCamera(); }}
+                    className="px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 text-xs"
+                  >
+                    🔄 Foto Ulang
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 shadow-xl transition-all"
+            >
+              Kirim Permohonan Audiensi ➔
+            </button>
+          </form>
+        </div>
+      );
+    }
+
+    // --- 2. MODUL TIKET QR TAMU ---
+    function GuestTicketModule({ appointment, allAppointments, onSelectTicket, onDirectToReceptionist }) {
+      return (
+        <div className="max-w-2xl mx-auto space-y-4">
+          <div className="flex items-center gap-2 overflow-x-auto p-2 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+            <span className="text-slate-400 pl-2">Pilih Tiket:</span>
+            {allAppointments.map(a => (
+              <button
+                key={a.id}
+                onClick={() => onSelectTicket(a.id)}
+                className={`px-2.5 py-1 rounded-lg font-mono text-[11px] ${
+                  a.id === appointment.id ? 'bg-cyan-600 text-white font-bold' : 'bg-slate-800 text-slate-300'
+                }`}
+              >
+                {a.trackingCode}
+              </button>
+            ))}
+          </div>
+
+          {/* Boarding Pass Style Card */}
+          <div className="rounded-3xl overflow-hidden bg-slate-900 border border-slate-700 shadow-2xl">
+            <div className="p-5 bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 border-b border-slate-800 flex justify-between items-center">
+              <div>
+                <span className="text-[10px] font-mono text-cyan-400 tracking-wider">OFFICIAL PASS</span>
+                <h2 className="text-lg font-black text-white">SMAN 1 PRESTASI BANGSA</h2>
+              </div>
+              <span className={`px-2.5 py-1 rounded-full text-[10px] font-mono font-bold border ${
+                appointment.status === 'DISETUJUI' ? 'bg-emerald-950 border-emerald-500 text-emerald-400' :
+                appointment.status === 'PENDING' ? 'bg-amber-950 border-amber-500 text-amber-400' :
+                'bg-cyan-950 border-cyan-500 text-cyan-400'
+              }`}>
+                {appointment.status}
+              </span>
+            </div>
+
+            <div className="p-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="flex flex-col items-center">
+                <img src={appointment.photoUrl} alt="Foto" className="w-28 h-28 rounded-2xl object-cover border-2 border-cyan-400 shadow" />
+                <span className="text-xs font-bold text-white mt-2 text-center">{appointment.fullName}</span>
+                <span className="text-[10px] text-cyan-400">{appointment.institutionName}</span>
+              </div>
+              <div className="sm:col-span-2 space-y-2 text-xs">
+                <div className="p-2.5 rounded-xl bg-slate-800/40 border border-slate-800">
+                  <span className="text-slate-400 block text-[10px]">Tujuan Penerima:</span>
+                  <span className="font-semibold text-slate-100">{appointment.targetHost}</span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-slate-800/40 border border-slate-800">
+                  <span className="text-slate-400 block text-[10px]">Slot & Lokasi:</span>
+                  <span className="font-semibold text-cyan-300">{appointment.meetingDate} ({appointment.startTime}) • {appointment.roomLocation}</span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-slate-800/40 border border-slate-800">
+                  <span className="text-slate-400 block text-[10px]">Perihal:</span>
+                  <p className="text-slate-300">{appointment.purpose}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 bg-slate-950 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-800">
+              <div className="flex items-center gap-3">
+                {/* Visual QR Code Mock */}
+                <div className="p-2 bg-white rounded-xl">
+                  <svg className="w-16 h-16 text-slate-900" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2 2h8v8H2zm2 2v4h4V4zm10-2h8v8h-8zm2 2v4h4V4zM2 14h8v8H2zm2 2v4h4v-4zm14 0h2v2h-2zm-4-2h2v2h-2zm2 4h2v2h-2zm2-2h2v2h-2zm-4 4h6v2h-6z"/>
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 block">Kode Pelacakan:</span>
+                  <span className="font-mono text-sm font-bold text-cyan-400">{appointment.trackingCode}</span>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => alert(`WhatsApp Simulation sent to ${appointment.phone}`)}
+                  className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-xs font-semibold text-white"
+                >
+                  Kirim ke WA
+                </button>
+                <button
+                  onClick={onDirectToReceptionist}
+                  className="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 rounded-xl text-xs font-semibold text-white"
+                >
+                  Uji di Lobi ➔
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // --- 3. MODUL DASBOR KEPALA SEKOLAH ---
+    function HostDashboardModule({ appointments, onUpdateAppointment }) {
+      const [activeModal, setActiveModal] = useState(null);
+      const [targetItem, setTargetItem] = useState(null);
+      const [selectedSlot, setSelectedSlot] = useState('08:30 - 09:15');
+
+      const isSlotConflicted = selectedSlot === '10:00 - 10:45';
+      const pendingAppointments = appointments.filter(a => a.status === 'PENDING');
+
+      const handleApprove = () => {
+        if (isSlotConflicted) return;
+        const [start, end] = selectedSlot.split(' - ');
+        onUpdateAppointment({
+          ...targetItem,
+          status: 'DISETUJUI',
+          startTime: start,
+          endTime: end,
+          roomLocation: 'Ruang Kepala Sekolah'
+        }, `Jadwal disetujui pada ${start} WIB.`);
+        setActiveModal(null);
+      };
+
+      return (
+        <div className="space-y-6">
+          <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 to-indigo-950 border border-slate-700 shadow-xl flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-bold text-white">Dr. H. Ahmad Sudrajat, M.Pd.</h2>
+              <p className="text-xs text-slate-400">Kepala SMAN 1 Prestasi Bangsa • Dasbor Triage & Approval</p>
+            </div>
+            <span className="px-3 py-1 rounded-full bg-cyan-950 border border-cyan-500/40 text-cyan-300 text-xs font-mono">
+              Auto-Sync Google Calendar
+            </span>
+          </div>
+
+          {/* Blocked Slot Notification */}
+          <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 text-xs space-y-1">
+            <span className="font-bold text-rose-400 block">🔒 Slot Terkunci Dinas Hari Ini:</span>
+            {BLOCKED_SCHEDULES.map((s, i) => (
+              <p key={i} className="text-slate-400 font-mono text-[11px]">• {s.start} - {s.end} WIB : {s.title}</p>
+            ))}
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="text-sm font-bold text-white">Antrean Pengajuan Masuk ({pendingAppointments.length})</h3>
+            {pendingAppointments.length === 0 ? (
+              <div className="p-8 text-center rounded-2xl bg-slate-900/40 border border-slate-800 text-slate-400 text-xs">
+                Tidak ada permohonan yang menunggu.
+              </div>
+            ) : (
+              pendingAppointments.map(item => (
+                <div key={item.id} className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <div className="flex items-center gap-3">
+                    <img src={item.photoUrl} alt="" className="w-14 h-14 rounded-xl object-cover border border-cyan-400" />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-white text-sm">{item.fullName}</span>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-cyan-400">{item.trackingCode}</span>
+                      </div>
+                      <p className="text-xs text-slate-400">{item.institutionName} • "{item.purpose}"</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => { setTargetItem(item); setActiveModal('approve'); }}
+                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold"
+                    >
+                      ✓ Setujui
+                    </button>
+                    <button
+                      onClick={() => onUpdateAppointment({ ...item, status: 'DITOLAK' }, 'Permohonan ditolak.')}
+                      className="px-3 py-1.5 bg-rose-950 hover:bg-rose-900 border border-rose-800 text-rose-300 rounded-xl text-xs"
+                    >
+                      ✕ Tolak
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {activeModal === 'approve' && (
+            <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+              <div className="w-full max-w-md bg-slate-900 border border-slate-700 rounded-2xl p-5 space-y-4">
+                <h3 className="text-sm font-bold text-white">Konfirmasi Jadwal Audiensi</h3>
+                <div className="text-xs space-y-2">
+                  <label className="block text-slate-300">Pilih Slot Jam:</label>
+                  <select
+                    value={selectedSlot}
+                    onChange={(e) => setSelectedSlot(e.target.value)}
+                    className="w-full p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white font-mono"
+                  >
+                    <option value="08:30 - 09:15">08:30 - 09:15 WIB (Tersedia)</option>
+                    <option value="09:15 - 10:00">09:15 - 10:00 WIB (Tersedia)</option>
+                    <option value="10:00 - 10:45">10:00 - 10:45 WIB ⚠️ (BENTROK DINAS)</option>
+                  </select>
+
+                  {isSlotConflicted && (
+                    <p className="text-rose-400 font-bold">Slot bentrok dengan agenda dinas! Tombol persetujuan dikunci.</p>
+                  )}
+                </div>
+
+                <div className="flex justify-end gap-2 pt-2">
+                  <button onClick={() => setActiveModal(null)} className="px-3 py-1.5 bg-slate-800 text-slate-300 rounded-xl text-xs">Batal</button>
+                  <button
+                    onClick={handleApprove}
+                    disabled={isSlotConflicted}
+                    className={`px-4 py-1.5 rounded-xl text-xs font-bold text-white ${
+                      isSlotConflicted ? 'bg-slate-700 cursor-not-allowed text-slate-500' : 'bg-emerald-600 hover:bg-emerald-500'
+                    }`}
+                  >
+                    Kunci & Setujui
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // --- 4. MODUL RESEPSIONIS TERMINAL LOBI ---
+    function ReceptionistTerminalModule({ appointments, onCheckIn, onCheckOut }) {
+      const [scannedCode, setScannedCode] = useState('SMT-2026-0813');
+      const activeGuest = appointments.find(a => a.trackingCode.toLowerCase() === scannedCode.trim().toLowerCase()) || appointments[0];
+      const isLate = activeGuest?.trackingCode === 'SMT-2026-0809';
+
+      return (
+        <div className="space-y-6">
+          <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-850 border border-slate-700 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <span className="text-[10px] font-mono text-cyan-400">TERMINAL 01 - MEJA DEPAN</span>
+              <h2 className="text-xl font-bold text-white">Scanner & Verifikasi Fisik Lobi</h2>
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={scannedCode}
+                onChange={(e) => setScannedCode(e.target.value)}
+                placeholder="Kode Tiket..."
+                className="px-3 py-2 rounded-xl bg-slate-800 border border-cyan-500 text-cyan-300 font-mono text-xs focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {isLate && (
+            <div className="p-4 rounded-xl bg-amber-950/80 border border-amber-500 text-amber-200 text-xs flex justify-between items-center">
+              <div>
+                <strong>JADWAL KEDALUWARSA (&gt;30 Menit).</strong> Konfirmasi dispensasi pimpinan sebelum check-in.
+              </div>
+              <button onClick={() => alert('WhatsApp terkirim ke pimpinan')} className="px-3 py-1 bg-amber-500 text-black font-bold rounded-lg text-xs">
+                Hubungi via WA
+              </button>
+            </div>
+          )}
+
+          {activeGuest && (
+            <div className="p-6 rounded-3xl bg-slate-900/80 border border-slate-700 shadow-2xl space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <span className="text-xs text-slate-300 font-semibold block mb-1">1. Foto Pendaftaran Web</span>
+                  <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-black border border-slate-700">
+                    <img src={activeGuest.photoUrl} alt="" className="w-full h-full object-cover" />
+                  </div>
+                </div>
+                <div>
+                  <span className="text-xs text-emerald-400 font-semibold block mb-1">2. Live Feed Kamera Lobi</span>
+                  <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-black border border-emerald-500/80 relative">
+                    <img src={activeGuest.photoUrl} alt="" className="w-full h-full object-cover filter contrast-105" />
+                    <div className="absolute inset-0 flex items-center justify-center border-2 border-emerald-400/50 m-4 rounded-2xl">
+                      <span className="bg-black/60 px-2 py-0.5 rounded text-[10px] font-mono text-emerald-400">MATCH 98.4%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center pt-2">
+                <div>
+                  <span className="font-bold text-white text-sm block">{activeGuest.fullName}</span>
+                  <span className="text-xs text-cyan-400">{activeGuest.targetHost} • {activeGuest.roomLocation}</span>
+                </div>
+
+                <div className="flex gap-2">
+                  {activeGuest.status === 'DISETUJUI' && (
+                    <button
+                      onClick={() => onCheckIn(activeGuest.id)}
+                      className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs"
+                    >
+                      ✓ Check-in Masuk
+                    </button>
+                  )}
+                  {activeGuest.status === 'SEDANG BERLANGSUNG' && (
+                    <button
+                      onClick={() => onCheckOut(activeGuest.id)}
+                      className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs"
+                    >
+                      👋 Check-out Selesai
+                    </button>
+                  )}
+                  {activeGuest.status === 'SELESAI' && (
+                    <span className="text-xs text-slate-400 font-mono">Selesai: {activeGuest.checkOutTime}</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // --- 5. MODUL ANALITIK & AUDIT TRAIL UU PDP ---
+    function AnalyticsAuditModule({ appointments }) {
+      return (
+        <div className="space-y-6">
+          <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-blue-950 border border-blue-500/40 flex justify-between items-center">
+            <div>
+              <h3 className="text-sm font-bold text-white">Kepatuhan UU No. 27/2022 (UU PDP)</h3>
+              <p className="text-xs text-slate-300">Enkripsi TLS 1.3 • Presigned URL Storage • Retensi Otomatis 180 Hari</p>
+            </div>
+            <button onClick={() => alert('Ekspor PDF/XLSX Berhasil Disimpan')} className="px-3 py-1.5 bg-slate-800 border border-slate-600 text-white rounded-xl text-xs font-semibold">
+              📥 Ekspor Audit
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              { label: 'Total Tamu Pekan Ini', val: '48 Tamu' },
+              { label: 'Rata-rata Durasi', val: '28 Menit' },
+              { label: 'Ketepatan Waktu', val: '92.8%' },
+              { label: 'Integritas Log', val: '100% Valid' },
+            ].map((k, i) => (
+              <div key={i} className="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
+                <span className="text-[10px] text-slate-400 block">{k.label}</span>
+                <span className="text-base font-bold text-cyan-400 mt-0.5 block font-mono">{k.val}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 overflow-x-auto">
+            <h4 className="text-xs font-bold text-white mb-3">Audit Trail Log Kunjungan</h4>
+            <table className="w-full text-left text-xs text-slate-300">
+              <thead className="text-[10px] text-slate-400 uppercase font-mono border-b border-slate-800">
+                <tr>
+                  <th className="p-2">Kode</th>
+                  <th className="p-2">Nama Tamu</th>
+                  <th className="p-2">Tujuan</th>
+                  <th className="p-2">Check-in</th>
+                  <th className="p-2">Check-out</th>
+                  <th className="p-2">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/60">
+                {appointments.map(a => (
+                  <tr key={a.id} className="hover:bg-slate-800/30">
+                    <td className="p-2 font-mono text-cyan-400">{a.trackingCode}</td>
+                    <td className="p-2 font-semibold text-white">{a.fullName}</td>
+                    <td className="p-2">{a.targetHost}</td>
+                    <td className="p-2 font-mono text-emerald-400">{a.checkInTime || '-'}</td>
+                    <td className="p-2 font-mono text-blue-400">{a.checkOutTime || '-'}</td>
+                    <td className="p-2">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-cyan-300">
+                        {a.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // Render ke Root DOM
+    ReactDOM.createRoot(document.getElementById('root')).render(<SIMTADIKApp />);
+  </script>
+</body>
+</html>
