@@ -1,1001 +1,2211 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SIMTADIK - Buku Tamu Digital & Scheduling Lobi Sekolah</title>
-  
-  <!-- Font Google: Plus Jakarta Sans -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <title>Sistem Buku Tamu Digital & Penjadwalan Sekolah</title>
+  <style>
+    /* ==========================================================================
+       TEMA WARNA: 70% KUNING (WARM AMBER / GOLD) & 30% BIRU (NAVY / ROYAL)
+       ========================================================================== */
+    :root {
+      /* Palette Kuning (70% dominan: latar, kartu, banner, badge, aksen) */
+      --yellow-50: #fffdf0;
+      --yellow-100: #fef9c3;
+      --yellow-200: #fef08a;
+      --yellow-300: #fde047;
+      --yellow-400: #facc15;
+      --yellow-500: #eab308;
+      --yellow-600: #ca8a04;
+      --yellow-700: #a16207;
 
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-          },
-          colors: {
-            brand: {
-              cyan: '#06B6D4',
-              blue: '#3B82F6',
-              emerald: '#10B981',
-              dark: '#0B0F19'
-            }
-          }
-        }
+      /* Palette Biru (30% struktural: header utama, tombol primer, border fokus, teks kontras) */
+      --blue-950: #0a192f;
+      --blue-900: #0f274a;
+      --blue-800: #1e3a8a;
+      --blue-700: #1d4ed8;
+      --blue-600: #2563eb;
+      --blue-100: #dbeafe;
+
+      /* Warna Netral & Status */
+      --white: #ffffff;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-500: #6b7280;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --danger: #dc2626;
+      --danger-bg: #fee2e2;
+      --success: #16a34a;
+      --success-bg: #dcfce7;
+      --warning: #d97706;
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 3px rgba(15, 39, 74, 0.08);
+      --shadow-md: 0 4px 12px rgba(15, 39, 74, 0.1);
+      --shadow-lg: 0 10px 25px -5px rgba(15, 39, 74, 0.15);
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at 10% 20%, var(--yellow-100) 0%, var(--yellow-50) 80%);
+      color: var(--gray-900);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ================= TOP HEADER DENGAN LOGO SEKOLAH ================= */
+    .app-header {
+      background: linear-gradient(135deg, var(--blue-900) 0%, var(--blue-800) 100%);
+      color: var(--white);
+      padding: 0.85rem 1.5rem;
+      box-shadow: 0 4px 20px rgba(10, 25, 47, 0.25);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 3px solid var(--yellow-400);
+    }
+
+    .header-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      background: var(--yellow-400);
+      color: var(--blue-950);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.3rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--white);
+    }
+
+    .brand-subtitle {
+      font-size: 0.75rem;
+      color: var(--yellow-300);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* Slot Logo Sekolah Pojok Kanan Atas */
+    .school-logo-slot {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.35rem 0.85rem;
+      border-radius: 40px;
+      border: 1px solid rgba(250, 204, 21, 0.4);
+    }
+
+    .school-logo-img {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      border-radius: 50%;
+      background: var(--white);
+      padding: 2px;
+      border: 1px solid var(--yellow-400);
+    }
+
+    .school-info-text {
+      text-align: right;
+      line-height: 1.2;
+    }
+
+    .school-info-name {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--yellow-300);
+    }
+
+    .school-info-loc {
+      font-size: 0.7rem;
+      color: #cbd5e1;
+    }
+
+    /* ================= NAVIGASI UTAMA DUAL-PORTAL ================= */
+    .portal-nav {
+      background: var(--yellow-200);
+      border-bottom: 2px solid var(--yellow-300);
+      padding: 0.5rem 1rem;
+    }
+
+    .nav-tabs {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 0.6rem 1.2rem;
+      border: 2px solid transparent;
+      border-radius: var(--radius-md);
+      background: transparent;
+      color: var(--blue-900);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      background: var(--yellow-300);
+    }
+
+    .tab-btn.active {
+      background: var(--blue-900);
+      color: var(--yellow-400);
+      border-color: var(--blue-900);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tab-badge {
+      background: var(--yellow-400);
+      color: var(--blue-950);
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: 12px;
+      font-weight: 800;
+    }
+
+    .tab-btn.active .tab-badge {
+      background: var(--yellow-300);
+      color: var(--blue-950);
+    }
+
+    /* ================= CONTAINER UTAMA ================= */
+    .main-wrapper {
+      max-width: 1240px;
+      width: 100%;
+      margin: 1.5rem auto;
+      padding: 0 1rem;
+      flex: 1;
+    }
+
+    .portal-section {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .portal-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ================= KARTU / CARD BERPOLA 70% KUNING ================= */
+    .yellow-card {
+      background: var(--yellow-100);
+      border: 2px solid var(--yellow-300);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+
+    .white-card {
+      background: var(--white);
+      border: 1px solid var(--yellow-200);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-title-bar {
+      border-bottom: 2px solid var(--yellow-300);
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--blue-900);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge-accent {
+      background: var(--blue-800);
+      color: var(--yellow-300);
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    /* ================= FORM STYLING ================= */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.1rem;
+    }
+
+    @media (min-width: 768px) {
+      .form-grid-2 {
+        grid-template-columns: 1fr 1fr;
+      }
+      .form-grid-3 {
+        grid-template-columns: 1fr 1fr 1fr;
       }
     }
-  </script>
 
-  <!-- React, ReactDOM, and Babel Standalone CDN -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
 
-  <!-- Custom Styles: Mirror Webcam & Utility Animations -->
-  <style>
-    .mirror {
-      transform: scaleX(-1);
+    .form-label {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--blue-900);
     }
-    @keyframes slideUp {
-      from { transform: translateY(100%); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+
+    .form-label .required {
+      color: var(--danger);
     }
-    .animate-slide-up {
-      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+    .form-control {
+      padding: 0.7rem 0.9rem;
+      border: 2px solid var(--yellow-400);
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      background: var(--white);
+      color: var(--gray-900);
+      outline: none;
+      transition: var(--transition);
     }
-    /* Scrollbar Styling */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+
+    .form-control:focus {
+      border-color: var(--blue-700);
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.2);
     }
-    ::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.6);
+
+    select.form-control {
+      cursor: pointer;
     }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(100, 116, 139, 0.4);
-      border-radius: 9999px;
+
+    textarea.form-control {
+      min-height: 90px;
+      resize: vertical;
     }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(6, 182, 212, 0.6);
+
+    /* Dynamic Category Field Highlights */
+    .adaptive-container {
+      background: var(--yellow-200);
+      border: 2px dashed var(--yellow-500);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      margin-top: 0.5rem;
+      animation: fadeIn 0.25s ease;
+    }
+
+    /* ================= MODUL LIVE CAMERA (WEBRTC) ================= */
+    .camera-module {
+      background: var(--blue-950);
+      border: 3px solid var(--yellow-400);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      color: var(--white);
+      text-align: center;
+      margin: 1rem 0;
+    }
+
+    .camera-viewport {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      height: 310px;
+      margin: 0.75rem auto;
+      background: #000;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--yellow-500);
+    }
+
+    #cameraVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1); /* Efek Cermin Natural */
+    }
+
+    #cameraCanvas {
+      display: none;
+    }
+
+    #snapshotImagePreview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    /* Siluet Oval Panduan Wajah (PRD Live Camera) */
+    .face-silhouette {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 170px;
+      height: 230px;
+      border: 2px dashed var(--yellow-400);
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      pointer-events: none;
+      box-shadow: 0 0 0 9999px rgba(10, 25, 47, 0.45);
+      z-index: 10;
+    }
+
+    .face-silhouette::after {
+      content: "Posisikan Wajah di Sini";
+      position: absolute;
+      bottom: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      color: var(--yellow-300);
+      font-weight: bold;
+      background: rgba(15, 39, 74, 0.85);
+      padding: 2px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .camera-actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 0.75rem;
+    }
+
+    /* ================= BUTTONS ================= */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.4rem;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: var(--transition);
+      text-decoration: none;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Tombol Biru (30% Accent Utama) */
+    .btn-blue {
+      background: var(--blue-800);
+      color: var(--yellow-300);
+      border-color: var(--blue-900);
+    }
+
+    .btn-blue:hover {
+      background: var(--blue-700);
+      color: var(--white);
+      box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+    }
+
+    /* Tombol Kuning (70% Brand Support) */
+    .btn-yellow {
+      background: var(--yellow-400);
+      color: var(--blue-950);
+      border-color: var(--yellow-500);
+    }
+
+    .btn-yellow:hover {
+      background: var(--yellow-300);
+      box-shadow: 0 4px 12px rgba(234, 179, 8, 0.35);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: var(--white);
+    }
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    .btn-secondary {
+      background: var(--gray-200);
+      color: var(--gray-700);
+    }
+    .btn-secondary:hover {
+      background: var(--gray-300);
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.7rem;
+      font-size: 0.78rem;
+      border-radius: var(--radius-sm);
+    }
+
+    /* ================= METRICS CARDS (DASHBOARD) ================= */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .metric-card {
+      background: var(--yellow-100);
+      border: 2px solid var(--yellow-300);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .metric-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+
+    .metric-blue { background: var(--blue-100); color: var(--blue-800); }
+    .metric-yellow { background: var(--yellow-300); color: var(--yellow-700); }
+    .metric-green { background: var(--success-bg); color: var(--success); }
+    .metric-red { background: var(--danger-bg); color: var(--danger); }
+
+    .metric-value {
+      font-size: 1.7rem;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--blue-950);
+    }
+
+    .metric-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-top: 3px;
+    }
+
+    /* ================= TABEL RESPONSIF ================= */
+    .table-responsive {
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--yellow-300);
+      background: var(--white);
+    }
+
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+
+    .custom-table thead {
+      background: var(--blue-900);
+      color: var(--yellow-300);
+    }
+
+    .custom-table th {
+      padding: 0.85rem 1rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    .custom-table td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--yellow-100);
+      vertical-align: middle;
+    }
+
+    .custom-table tr:hover {
+      background: var(--yellow-50);
+    }
+
+    .avatar-preview {
+      width: 46px;
+      height: 46px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 2px solid var(--yellow-400);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .avatar-preview:hover {
+      transform: scale(1.15);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Status Badges */
+    .badge {
+      display: inline-block;
+      padding: 0.28rem 0.65rem;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-pending { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+    .badge-approved { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+    .badge-rejected { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    .badge-checked_in { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+    .badge-completed { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; }
+
+    .urgency-pill {
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    .urgency-normal { background: #e0f2fe; color: #0369a1; }
+    .urgency-important { background: #fef08a; color: #854d0e; }
+    .urgency-urgent { background: #fee2e2; color: #b91c1c; font-weight: 900; }
+
+    /* ================= MODAL DIALOGS ================= */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(10, 25, 47, 0.7);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--white);
+      border: 3px solid var(--yellow-400);
+      border-radius: var(--radius-lg);
+      max-width: 520px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      animation: modalSlide 0.25s ease-out;
+    }
+
+    @keyframes modalSlide {
+      from { opacity: 0; transform: translateY(-20px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-header {
+      background: var(--blue-900);
+      color: var(--yellow-300);
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--white);
+      font-size: 1.4rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .modal-body {
+      padding: 1.25rem;
+    }
+
+    .modal-footer {
+      background: var(--yellow-100);
+      padding: 0.85rem 1.25rem;
+      border-top: 1px solid var(--yellow-300);
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+    }
+
+    /* Peringatan Anti Benturan */
+    .conflict-banner {
+      background: var(--danger-bg);
+      border: 2px solid var(--danger);
+      color: #7f1d1d;
+      padding: 0.85rem;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      margin-top: 0.75rem;
+      display: none;
+    }
+
+    /* ================= TIKET RESULT CARD (PUBLIC & LACAK) ================= */
+    .ticket-view {
+      background: linear-gradient(135deg, var(--yellow-100) 0%, #fff 100%);
+      border: 2px dashed var(--yellow-600);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      text-align: center;
+      margin-top: 1rem;
+      position: relative;
+    }
+
+    .ticket-number {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--blue-900);
+      letter-spacing: 1.5px;
+      background: var(--yellow-300);
+      display: inline-block;
+      padding: 0.35rem 1.2rem;
+      border-radius: 8px;
+      margin: 0.5rem 0;
+      border: 2px solid var(--yellow-500);
+    }
+
+    .qr-simulator-box {
+      width: 150px;
+      height: 150px;
+      background: var(--white);
+      border: 3px solid var(--blue-900);
+      border-radius: 12px;
+      margin: 1rem auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
+    }
+
+    /* ================= NOTIFIKASI TOAST ================= */
+    .toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .toast {
+      background: var(--blue-900);
+      color: var(--white);
+      padding: 0.85rem 1.25rem;
+      border-radius: var(--radius-md);
+      border-left: 5px solid var(--yellow-400);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.25);
+      font-size: 0.88rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Kios Simulator Satpam */
+    .scanner-box {
+      background: var(--blue-950);
+      color: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      border: 3px solid var(--yellow-400);
+      text-align: center;
+    }
+
+    .scanner-screen {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px dashed var(--yellow-300);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin-top: 1rem;
     }
   </style>
 </head>
-<body class="bg-[#0B0F19] text-slate-100 antialiased selection:bg-cyan-500 selection:text-white">
-  
-  <div id="root"></div>
+<body>
 
-  <!-- React Component Script -->
-  <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
-
-    const INITIAL_APPOINTMENTS = [
-      {
-        id: 'apt-1',
-        trackingCode: 'SMT-2026-0812',
-        category: 'instansi',
-        fullName: 'Drs. H. Mulyadi, M.Pd.',
-        phone: '081234567890',
-        identifierNo: '197103151996031002',
-        institutionName: 'Cabang Dinas Pendidikan Wilayah III',
-        taskLetterNo: '800/142/Disdik/IX/2026',
-        purpose: 'Koordinasi Penyaluran Bantuan Sarpras Lab Digital & Monitoring BOS',
-        urgency: 'penting',
-        photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&fit=crop&q=80',
-        status: 'PENDING',
-        targetHost: 'Dr. H. Ahmad Sudrajat, M.Pd. (Kepala Sekolah)',
-        createdAt: '2026-09-11 08:30 WIB',
-        meetingDate: '2026-09-11',
-        startTime: '10:00',
-        endTime: '10:45',
-        roomLocation: 'Ruang Kepala Sekolah',
-        checkInTime: null,
-        checkOutTime: null,
-        receptionistName: null,
-        jwtSignature: 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJTSU1UQURJSyJ9.demo1'
-      },
-      {
-        id: 'apt-2',
-        trackingCode: 'SMT-2026-0813',
-        category: 'ortu',
-        fullName: 'Ibu Ratna Kartika, S.E.',
-        phone: '085712348899',
-        identifierNo: 'NISN Siswa: 0089123488 (Arya Putra X-4)',
-        institutionName: 'Komite Kelas X',
-        purpose: 'Konsultasi Perizinan Program Pertukaran Pelajar Jepang & Beasiswa',
-        urgency: 'biasa',
-        photoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&fit=crop&q=80',
-        status: 'DISETUJUI',
-        targetHost: 'Dr. H. Ahmad Sudrajat, M.Pd. (Kepala Sekolah)',
-        createdAt: '2026-09-10 14:15 WIB',
-        meetingDate: '2026-09-11',
-        startTime: '09:00',
-        endTime: '09:30',
-        roomLocation: 'Ruang Tamu VVIP Lobi',
-        checkInTime: null,
-        checkOutTime: null,
-        receptionistName: 'Rian Pratama (Lobi-1)',
-        jwtSignature: 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJTSU1UQURJSyJ9.demo2'
-      },
-      {
-        id: 'apt-3',
-        trackingCode: 'SMT-2026-0814',
-        category: 'vendor',
-        fullName: 'Bambang Irawan, S.Kom.',
-        phone: '081399887711',
-        identifierNo: 'PT Telkom Solusi Indonesia',
-        institutionName: 'PT Telkom Solusi Indonesia',
-        taskLetterNo: 'TSI/SPK-NET/VIII/2026',
-        purpose: 'Finalisasi Berita Acara Uji Terima Fiber Optik 10 Gbps Smart School',
-        urgency: 'mendesak',
-        photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&fit=crop&q=80',
-        status: 'SEDANG BERLANGSUNG',
-        targetHost: 'Ir. Bambang Sujarwo (Wakasek Sarpras)',
-        createdAt: '2026-09-11 07:45 WIB',
-        meetingDate: '2026-09-11',
-        startTime: '08:30',
-        endTime: '09:15',
-        roomLocation: 'Ruang Rapat Mini Lt. 2',
-        checkInTime: '08:28 WIB',
-        checkOutTime: null,
-        receptionistName: 'Rian Pratama (Lobi-1)',
-        jwtSignature: 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.demo3'
-      },
-      {
-        id: 'apt-4',
-        trackingCode: 'SMT-2026-0809',
-        category: 'instansi',
-        fullName: 'Agus Wijanarko, S.H.',
-        phone: '081298765432',
-        identifierNo: 'Bawaslu Kota - Divisi Edukasi',
-        institutionName: 'Bawaslu Kota',
-        taskLetterNo: 'ST/102/BWL/IX/2026',
-        purpose: 'Sosialisasi Pemilih Pemula di Lingkungan Sekolah Menengah',
-        urgency: 'biasa',
-        photoUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&fit=crop&q=80',
-        status: 'DISETUJUI',
-        targetHost: 'Dr. H. Ahmad Sudrajat, M.Pd. (Kepala Sekolah)',
-        createdAt: '2026-09-11 06:30 WIB',
-        meetingDate: '2026-09-11',
-        startTime: '08:00',
-        endTime: '08:45',
-        roomLocation: 'Ruang Kepala Sekolah',
-        checkInTime: null,
-        checkOutTime: null,
-        receptionistName: 'Rian Pratama (Lobi-1)',
-        jwtSignature: 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.demo4'
-      }
-    ];
-
-    const BLOCKED_SCHEDULES = [
-      { start: '10:00', end: '11:00', title: 'Rapat Koordinasi Evaluasi ANBK Cabdin Wilayah III (Via Zoom)' },
-      { start: '11:45', end: '13:00', title: 'Istirahat & Supervisi Shalat Berjamaah Masjid Sekolah' }
-    ];
-
-    function SIMTADIKApp() {
-      const [activeRole, setActiveRole] = useState('guest-form');
-      const [darkMode, setDarkMode] = useState(true);
-      const [appointments, setAppointments] = useState(INITIAL_APPOINTMENTS);
-      const [selectedTicketId, setSelectedTicketId] = useState('apt-1');
-      const [toastMessage, setToastMessage] = useState(null);
-
-      const toggleTheme = () => {
-        const nextMode = !darkMode;
-        setDarkMode(nextMode);
-        if (nextMode) {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-      };
-
-      const showToast = (title, desc) => {
-        setToastMessage({ title, desc });
-        setTimeout(() => setToastMessage(null), 4000);
-      };
-
-      const currentTicket = appointments.find(a => a.id === selectedTicketId) || appointments[0];
-
-      return (
-        <div className={`${darkMode ? 'dark bg-[#0B0F19] text-slate-100' : 'bg-slate-50 text-slate-900'} min-h-screen transition-colors duration-200`}>
-          {/* TOP BAR ROLE SWITCHER */}
-          <header className="sticky top-0 z-50 backdrop-blur-xl border-b border-slate-700/50 bg-slate-950/80 px-4 py-2.5 shadow-xl">
-            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5 w-full md:w-auto justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 via-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/25 border border-cyan-400/40 font-black text-white text-sm">
-                    S
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-extrabold text-sm tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-emerald-400">
-                        SIMTADIK
-                      </span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-950 border border-cyan-500/40 text-cyan-300 font-mono">v1.1</span>
-                    </div>
-                    <p className="text-[10px] text-slate-400 font-medium">SMAN 1 Prestasi Bangsa</p>
-                  </div>
-                </div>
-
-                <button onClick={toggleTheme} className="md:hidden p-1.5 rounded-lg border border-slate-700 bg-slate-800 text-xs">
-                  {darkMode ? '☀️' : '🌙'}
-                </button>
-              </div>
-
-              {/* Central Switcher */}
-              <nav className="flex items-center overflow-x-auto max-w-full pb-1 md:pb-0 gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
-                {[
-                  { id: 'guest-form', label: '1. Form Tamu', icon: '📝' },
-                  { id: 'guest-ticket', label: '2. E-Ticket QR', icon: '🎫' },
-                  { id: 'host-dash', label: '3. Dasbor Kepala Sekolah', icon: '🛡️', badge: appointments.filter(a => a.status === 'PENDING').length },
-                  { id: 'receptionist', label: '4. Terminal Lobi', icon: '🖥️' },
-                  { id: 'analytics', label: '5. Analitik & Audit', icon: '📊' },
-                ].map(tab => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveRole(tab.id)}
-                    className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                      activeRole === tab.id
-                        ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md shadow-cyan-600/30'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-                    }`}
-                  >
-                    <span>{tab.icon}</span>
-                    <span>{tab.label}</span>
-                    {tab.badge !== undefined && tab.badge > 0 && (
-                      <span className="ml-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] flex items-center justify-center font-bold">
-                        {tab.badge}
-                      </span>
-                    )}
-                  </button>
-                ))}
-              </nav>
-
-              <div className="hidden md:flex items-center gap-3 text-xs">
-                <span className="px-2.5 py-1 rounded-full bg-emerald-950/70 border border-emerald-500/40 text-emerald-400 font-mono text-[11px]">
-                  ● UU PDP 27/2022
-                </span>
-                <button
-                  onClick={toggleTheme}
-                  className="p-1.5 px-2.5 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
-                >
-                  {darkMode ? '☀️ Terang' : '🌙 Gelap'}
-                </button>
-              </div>
-            </div>
-          </header>
-
-          {/* GLOBAL TOAST */}
-          {toastMessage && (
-            <div className="fixed bottom-5 right-5 z-50 max-w-sm bg-slate-900 border border-cyan-500/50 shadow-2xl text-white p-4 rounded-xl flex items-start gap-3 animate-slide-up">
-              <div className="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-xs">✓</div>
-              <div>
-                <h4 className="text-xs font-bold text-cyan-300">{toastMessage.title}</h4>
-                <p className="text-[11px] text-slate-300 mt-0.5">{toastMessage.desc}</p>
-              </div>
-            </div>
-          )}
-
-          {/* VIEWS */}
-          <main className="max-w-7xl mx-auto p-4 md:p-6">
-            {activeRole === 'guest-form' && (
-              <GuestRegistrationModule
-                onAppointmentCreated={(newApt) => {
-                  setAppointments([newApt, ...appointments]);
-                  setSelectedTicketId(newApt.id);
-                  showToast('Permohonan Terkirim!', `Kode: ${newApt.trackingCode}. Notifikasi diteruskan ke pimpinan.`);
-                  setActiveRole('guest-ticket');
-                }}
-              />
-            )}
-
-            {activeRole === 'guest-ticket' && (
-              <GuestTicketModule
-                appointment={currentTicket}
-                allAppointments={appointments}
-                onSelectTicket={(id) => setSelectedTicketId(id)}
-                onDirectToReceptionist={() => setActiveRole('receptionist')}
-              />
-            )}
-
-            {activeRole === 'host-dash' && (
-              <HostDashboardModule
-                appointments={appointments}
-                onUpdateAppointment={(updatedApt, actionTitle) => {
-                  setAppointments(appointments.map(a => a.id === updatedApt.id ? updatedApt : a));
-                  showToast('Tindakan Berhasil Disimpan', actionTitle);
-                }}
-              />
-            )}
-
-            {activeRole === 'receptionist' && (
-              <ReceptionistTerminalModule
-                appointments={appointments}
-                onCheckIn={(aptId) => {
-                  const now = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
-                  setAppointments(appointments.map(a => a.id === aptId ? {
-                    ...a,
-                    status: 'SEDANG BERLANGSUNG',
-                    checkInTime: now,
-                    receptionistName: 'Rian Pratama (Lobi-1)'
-                  } : a));
-                  showToast('Tamu Check-In Sukses', 'Status diperbarui: SEDANG BERLANGSUNG.');
-                }}
-                onCheckOut={(aptId) => {
-                  const now = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
-                  setAppointments(appointments.map(a => a.id === aptId ? {
-                    ...a,
-                    status: 'SELESAI',
-                    checkOutTime: now
-                  } : a));
-                  showToast('Tamu Check-Out', 'Kunjungan telah selesai. Log tersimpan permanen.');
-                }}
-              />
-            )}
-
-            {activeRole === 'analytics' && (
-              <AnalyticsAuditModule appointments={appointments} />
-            )}
-          </main>
+  <!-- ================= HEADER DENGAN LOGO SEKOLAH (POJOK KANAN ATAS) ================= -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-group">
+        <div class="brand-icon">🏛️</div>
+        <div>
+          <div class="brand-title">SI-TAMU PRESISI</div>
+          <div class="brand-subtitle">Buku Tamu Digital & Penjadwalan Janji Temu</div>
         </div>
-      );
-    }
+      </div>
 
-    // --- 1. MODUL FORMULIR TAMU ---
-    function GuestRegistrationModule({ onAppointmentCreated }) {
-      const [category, setCategory] = useState('instansi');
-      const [fullName, setFullName] = useState('');
-      const [phone, setPhone] = useState('');
-      const [purpose, setPurpose] = useState('');
-      const [urgency, setUrgency] = useState('biasa');
-      const [nisn, setNisn] = useState('');
-      const [kelas, setKelas] = useState('');
-      const [institutionName, setInstitutionName] = useState('');
-      const [taskLetterNo, setTaskLetterNo] = useState('');
+      <!-- Komponen Logo Sekolah yang dapat di-upload/di-ganti melalui Variabel JavaScript -->
+      <div class="school-logo-slot">
+        <div class="school-info-text">
+          <div class="school-info-name" id="displaySchoolName">SMA NEGERI TERPADU</div>
+          <div class="school-info-loc">Portal Pelayanan Tamu & Pimpinan</div>
+        </div>
+        <img id="schoolLogoElement" class="school-logo-img" alt="Logo Sekolah" src="" />
+      </div>
+    </div>
+  </header>
 
-      const videoRef = useRef(null);
-      const canvasRef = useRef(null);
-      const [isCameraActive, setIsCameraActive] = useState(false);
-      const [capturedPhoto, setCapturedPhoto] = useState(null);
-      const [luminanceAlert, setLuminanceAlert] = useState(false);
+  <!-- ================= NAVIGASI UTAMA ANTAR PORTAL ================= -->
+  <nav class="portal-nav">
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchPortal('guest-registration')">
+        📝 Form Tamu Baru
+      </button>
+      <button class="tab-btn" onclick="switchPortal('guest-tracking')">
+        🔍 Lacak Tiket Mandiri
+      </button>
+      <button class="tab-btn" onclick="switchPortal('host-portal')">
+        🔒 Portal Admin/Kepala Sekolah
+        <span class="tab-badge" id="pendingCountBadge">0 Pending</span>
+      </button>
+      <button class="tab-btn" onclick="switchPortal('security-kiosk')">
+        🛡️ Simulasi Check-In Lobi
+      </button>
+    </div>
+  </nav>
 
-      const startCamera = async () => {
-        try {
-          if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-            if (videoRef.current) {
-              videoRef.current.srcObject = stream;
-              videoRef.current.play();
-              setIsCameraActive(true);
-            }
-          }
-        } catch (err) {
-          setIsCameraActive(false);
-        }
-      };
+  <!-- ================= CONTAINER KONTEN UTAMA ================= -->
+  <main class="main-wrapper">
 
-      const stopCamera = () => {
-        if (videoRef.current && videoRef.current.srcObject) {
-          videoRef.current.srcObject.getTracks().forEach(track => track.stop());
-        }
-        setIsCameraActive(false);
-      };
+    <!-- ================= 1. PORTAL PUBLIK: FORM REGISTRASI TAMU ================= -->
+    <section id="guest-registration" class="portal-section active">
+      <div class="yellow-card">
+        <div class="card-title-bar">
+          <div class="card-title">
+            <span>📋</span> Formulir Permohonan Janji Temu
+          </div>
+          <span class="badge-accent">Guest Portal - Tanpa Perlu Login</span>
+        </div>
 
-      useEffect(() => {
-        startCamera();
-        return () => stopCamera();
-      }, []);
+        <form id="appointmentForm" onsubmit="handleGuestSubmit(event)">
+          <div class="form-grid form-grid-2">
 
-      const capturePhoto = () => {
-        const video = videoRef.current;
-        const canvas = canvasRef.current;
-        if (video && isCameraActive && canvas) {
-          const ctx = canvas.getContext('2d');
-          canvas.width = 480;
-          canvas.height = 360;
-          ctx.drawImage(video, 0, 0, 480, 360);
-          
-          const imgData = ctx.getImageData(0, 0, 480, 360).data;
-          let sumLum = 0;
-          for (let i = 0; i < imgData.length; i += 4) {
-            sumLum += 0.299 * imgData[i] + 0.587 * imgData[i + 1] + 0.114 * imgData[i + 2];
-          }
-          const avgBrightness = Math.round(sumLum / (imgData.length / 4));
-          setLuminanceAlert(avgBrightness < 35);
+            <!-- Kategori Tamu Adaptif -->
+            <div class="form-group">
+              <label class="form-label">Kategori Tamu <span class="required">*</span></label>
+              <select id="guestCategory" class="form-control" onchange="renderAdaptiveFields()" required>
+                <option value="" disabled selected>-- Pilih Kategori Anda --</option>
+                <option value="SISWA">Siswa Sekolah</option>
+                <option value="WALI_MURID">Orang Tua / Wali Murid</option>
+                <option value="INSTANSI">Tamu Luar / Instansi / Dinas</option>
+              </select>
+            </div>
 
-          setCapturedPhoto(canvas.toDataURL('image/jpeg', 0.85));
-          stopCamera();
-        } else {
-          setCapturedPhoto('https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&fit=crop&q=80');
-          setLuminanceAlert(false);
-        }
-      };
+            <!-- Nama Lengkap Pemohon (Selalu Ada) -->
+            <div class="form-group">
+              <label class="form-label" id="labelFullName">Nama Lengkap Tamu <span class="required">*</span></label>
+              <input type="text" id="fullName" class="form-control" placeholder="Masukkan nama lengkap Anda" required />
+            </div>
 
-      const handleSubmit = (e) => {
-        e.preventDefault();
-        if (!fullName || !phone || !purpose) {
-          alert('Harap lengkapi semua kolom.');
-          return;
-        }
-        if (!capturedPhoto) {
-          alert('Harap ambil foto wajah Anda.');
-          return;
-        }
-
-        const rand = Math.floor(1000 + Math.random() * 9000);
-        onAppointmentCreated({
-          id: 'apt-' + Date.now(),
-          trackingCode: `SMT-2026-${rand}`,
-          category,
-          fullName,
-          phone,
-          identifierNo: category === 'siswa' ? `NISN: ${nisn} (${kelas})` : taskLetterNo || 'Identitas Terverifikasi',
-          institutionName: category === 'instansi' || category === 'vendor' ? institutionName : 'Internal Sekolah',
-          purpose,
-          urgency,
-          photoUrl: capturedPhoto,
-          status: 'PENDING',
-          targetHost: 'Dr. H. Ahmad Sudrajat, M.Pd. (Kepala Sekolah)',
-          createdAt: 'Hari ini',
-          meetingDate: '2026-09-11',
-          startTime: 'Menunggu Persetujuan',
-          endTime: 'Menunggu Persetujuan',
-          roomLocation: 'Ruang Kepala Sekolah'
-        });
-      };
-
-      return (
-        <div className="max-w-4xl mx-auto space-y-6">
-          <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 border border-slate-700 shadow-xl">
-            <h1 className="text-2xl font-bold text-white">Formulir Pengajuan Audiensi</h1>
-            <p className="text-slate-400 text-xs mt-1">Sistem Buku Tamu & Registrasi Pimpinan Terintegrasi UU PDP 2022.</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-3">
-              <label className="text-xs font-semibold text-slate-300">1. Pilih Kategori Tamu:</label>
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-                {[
-                  { id: 'siswa', label: 'Siswa', icon: '🎓' },
-                  { id: 'ortu', label: 'Orang Tua', icon: '👨‍👩‍👧' },
-                  { id: 'guru', label: 'Guru/Staf', icon: '💼' },
-                  { id: 'instansi', label: 'Instansi Luar', icon: '🏛️' },
-                  { id: 'vendor', label: 'Vendor', icon: '🤝' },
-                ].map(c => (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() => setCategory(c.id)}
-                    className={`p-3 rounded-xl border text-center transition-all ${
-                      category === c.id
-                        ? 'bg-cyan-950/60 border-cyan-400 text-cyan-300 font-bold ring-1 ring-cyan-400'
-                        : 'bg-slate-800/50 border-slate-700 text-slate-300 hover:bg-slate-800'
-                    }`}
-                  >
-                    <div className="text-xl mb-1">{c.icon}</div>
-                    <div className="text-xs">{c.label}</div>
-                  </button>
-                ))}
-              </div>
+          <!-- CONTAINER FIELD ADAPTIF (DINAMIS SESUAI KATEGORI) -->
+          <div id="adaptiveFieldContainer" style="display:none;" class="adaptive-container">
+            <!-- Diisi lewat JavaScript renderAdaptiveFields() -->
+          </div>
+
+          <div class="form-grid form-grid-3" style="margin-top: 1rem;">
+            <div class="form-group">
+              <label class="form-label">Nomor WhatsApp Aktif <span class="required">*</span></label>
+              <input type="tel" id="whatsappNumber" class="form-control" placeholder="Contoh: 081234567890" pattern="[0-9]{10,15}" required />
+              <small style="color:var(--gray-700); font-size: 0.72rem;">*Digunakan untuk verifikasi status & tiket QR</small>
             </div>
 
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs text-slate-300 block mb-1">Nama Lengkap & Gelar *</label>
-                  <input
-                    type="text"
-                    required
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="cth. Drs. H. Mulyadi, M.Pd."
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:outline-none focus:border-cyan-400"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs text-slate-300 block mb-1">Nomor WhatsApp Aktif *</label>
-                  <input
-                    type="tel"
-                    required
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="cth. 081234567890"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:outline-none focus:border-cyan-400"
-                  />
-                </div>
-              </div>
-
-              {(category === 'instansi' || category === 'vendor') && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs text-slate-300 block mb-1">Nama Lembaga / Instansi</label>
-                    <input
-                      type="text"
-                      value={institutionName}
-                      onChange={(e) => setInstitutionName(e.target.value)}
-                      placeholder="cth. Cabang Dinas Pendidikan"
-                      className="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-slate-300 block mb-1">Nomor Surat Tugas</label>
-                    <input
-                      type="text"
-                      value={taskLetterNo}
-                      onChange={(e) => setTaskLetterNo(e.target.value)}
-                      placeholder="cth. 800/142/Disdik/IX/2026"
-                      className="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white"
-                    />
-                  </div>
-                </div>
-              )}
-
-              <div>
-                <label className="text-xs text-slate-300 block mb-1">Perihal Audiensi *</label>
-                <textarea
-                  rows={2}
-                  required
-                  value={purpose}
-                  onChange={(e) => setPurpose(e.target.value)}
-                  placeholder="Jelaskan agenda pertemuan..."
-                  className="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs text-slate-300 block mb-2">Tingkat Urgensi:</label>
-                <div className="flex gap-2">
-                  {['biasa', 'penting', 'mendesak'].map((u) => (
-                    <button
-                      key={u}
-                      type="button"
-                      onClick={() => setUrgency(u)}
-                      className={`px-3 py-1.5 rounded-lg border text-xs capitalize ${
-                        urgency === u ? 'bg-cyan-950 border-cyan-400 text-cyan-300 font-bold' : 'bg-slate-800 border-slate-700 text-slate-400'
-                      }`}
-                    >
-                      {u}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            <div class="form-group">
+              <label class="form-label">Tingkat Urgensi <span class="required">*</span></label>
+              <select id="urgencyLevel" class="form-control" required>
+                <option value="NORMAL">Biasa (Normal)</option>
+                <option value="IMPORTANT">Penting (Prioritas Reguler)</option>
+                <option value="URGENT">Mendesak (Darurat / Mendesak)</option>
+              </select>
             </div>
 
-            {/* LIVE WEBCAM CAPTURE */}
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-semibold text-slate-200">Verifikasi Wajah Langsung (Anti-Spoofing)</span>
-                <span className="text-[10px] font-mono text-cyan-400">Live Camera API</span>
-              </div>
+            <div class="form-group">
+              <label class="form-label">Tanggal yang Diinginkan <span class="required">*</span></label>
+              <input type="date" id="requestedDate" class="form-control" required />
+            </div>
+          </div>
 
-              <div className="relative max-w-sm mx-auto aspect-[4/3] rounded-2xl overflow-hidden bg-slate-950 border-2 border-slate-700 flex items-center justify-center">
-                {!capturedPhoto && isCameraActive && (
-                  <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover mirror" />
-                )}
-                {capturedPhoto && (
-                  <img src={capturedPhoto} alt="Snapshot" className="w-full h-full object-cover" />
-                )}
-                {!capturedPhoto && !isCameraActive && (
-                  <div className="text-center p-4">
-                    <p className="text-xs text-slate-400">Kamera tidak aktif atau izin ditolak.</p>
-                    <button type="button" onClick={startCamera} className="mt-2 px-3 py-1 bg-cyan-600 rounded-lg text-xs font-bold">
-                      Nyalakan Kamera
-                    </button>
-                  </div>
-                )}
-                <canvas ref={canvasRef} className="hidden" />
-              </div>
+          <div class="form-group" style="margin-top: 1rem;">
+            <label class="form-label">Keperluan / Perihal Pertemuan <span class="required">*</span></label>
+            <textarea id="purpose" class="form-control" placeholder="Tuliskan secara ringkas dan jelas maksud audiensi/keperluan Anda dengan pihak pimpinan sekolah..." required></textarea>
+          </div>
 
-              {luminanceAlert && (
-                <div className="p-2.5 rounded-xl bg-amber-950/80 border border-amber-500/80 text-amber-300 text-xs">
-                  ⚠️ <strong>Pencahayaan Terlalu Gelap.</strong> Harap cari tempat yang lebih terang.
-                </div>
-              )}
+          <!-- MODUL LIVE CAMERA CAPTURE (WEBRTC) -->
+          <div class="camera-module">
+            <h4 style="color: var(--yellow-400); font-size: 1rem; margin-bottom: 0.35rem;">
+              📸 Verifikasi Visual Biometrik (Live Camera Saja)
+            </h4>
+            <p style="font-size: 0.78rem; color: #e2e8f0;">
+              Sesuai PRD keamanan: Pengunggahan berkas lokal dilarang. Wajib menggunakan kamera perangkat secara langsung.
+            </p>
 
-              <div className="flex justify-center gap-2">
-                {!capturedPhoto ? (
-                  <button
-                    type="button"
-                    onClick={capturePhoto}
-                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold text-xs shadow-lg"
-                  >
-                    📸 Ambil Foto Wajah
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => { setCapturedPhoto(null); startCamera(); }}
-                    className="px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 text-xs"
-                  >
-                    🔄 Foto Ulang
-                  </button>
-                )}
-              </div>
+            <div class="camera-viewport">
+              <video id="cameraVideo" autoplay playsinline></video>
+              <div id="silhouetteGuide" class="face-silhouette" style="display:none;"></div>
+              <img id="snapshotImagePreview" alt="Hasil Foto Langsung" />
+              <canvas id="cameraCanvas"></canvas>
             </div>
 
-            <button
-              type="submit"
-              className="w-full py-3.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 shadow-xl transition-all"
-            >
-              Kirim Permohonan Audiensi ➔
-            </button>
-          </form>
-        </div>
-      );
-    }
-
-    // --- 2. MODUL TIKET QR TAMU ---
-    function GuestTicketModule({ appointment, allAppointments, onSelectTicket, onDirectToReceptionist }) {
-      return (
-        <div className="max-w-2xl mx-auto space-y-4">
-          <div className="flex items-center gap-2 overflow-x-auto p-2 rounded-xl bg-slate-900 border border-slate-800 text-xs">
-            <span className="text-slate-400 pl-2">Pilih Tiket:</span>
-            {allAppointments.map(a => (
-              <button
-                key={a.id}
-                onClick={() => onSelectTicket(a.id)}
-                className={`px-2.5 py-1 rounded-lg font-mono text-[11px] ${
-                  a.id === appointment.id ? 'bg-cyan-600 text-white font-bold' : 'bg-slate-800 text-slate-300'
-                }`}
-              >
-                {a.trackingCode}
+            <div class="camera-actions">
+              <button type="button" id="btnOpenCamera" class="btn btn-yellow" onclick="startCamera()">
+                🎥 Buka Kamera
               </button>
-            ))}
-          </div>
-
-          {/* Boarding Pass Style Card */}
-          <div className="rounded-3xl overflow-hidden bg-slate-900 border border-slate-700 shadow-2xl">
-            <div className="p-5 bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 border-b border-slate-800 flex justify-between items-center">
-              <div>
-                <span className="text-[10px] font-mono text-cyan-400 tracking-wider">OFFICIAL PASS</span>
-                <h2 className="text-lg font-black text-white">SMAN 1 PRESTASI BANGSA</h2>
-              </div>
-              <span className={`px-2.5 py-1 rounded-full text-[10px] font-mono font-bold border ${
-                appointment.status === 'DISETUJUI' ? 'bg-emerald-950 border-emerald-500 text-emerald-400' :
-                appointment.status === 'PENDING' ? 'bg-amber-950 border-amber-500 text-amber-400' :
-                'bg-cyan-950 border-cyan-500 text-cyan-400'
-              }`}>
-                {appointment.status}
-              </span>
-            </div>
-
-            <div className="p-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="flex flex-col items-center">
-                <img src={appointment.photoUrl} alt="Foto" className="w-28 h-28 rounded-2xl object-cover border-2 border-cyan-400 shadow" />
-                <span className="text-xs font-bold text-white mt-2 text-center">{appointment.fullName}</span>
-                <span className="text-[10px] text-cyan-400">{appointment.institutionName}</span>
-              </div>
-              <div className="sm:col-span-2 space-y-2 text-xs">
-                <div className="p-2.5 rounded-xl bg-slate-800/40 border border-slate-800">
-                  <span className="text-slate-400 block text-[10px]">Tujuan Penerima:</span>
-                  <span className="font-semibold text-slate-100">{appointment.targetHost}</span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-slate-800/40 border border-slate-800">
-                  <span className="text-slate-400 block text-[10px]">Slot & Lokasi:</span>
-                  <span className="font-semibold text-cyan-300">{appointment.meetingDate} ({appointment.startTime}) • {appointment.roomLocation}</span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-slate-800/40 border border-slate-800">
-                  <span className="text-slate-400 block text-[10px]">Perihal:</span>
-                  <p className="text-slate-300">{appointment.purpose}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-6 bg-slate-950 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-800">
-              <div className="flex items-center gap-3">
-                {/* Visual QR Code Mock */}
-                <div className="p-2 bg-white rounded-xl">
-                  <svg className="w-16 h-16 text-slate-900" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M2 2h8v8H2zm2 2v4h4V4zm10-2h8v8h-8zm2 2v4h4V4zM2 14h8v8H2zm2 2v4h4v-4zm14 0h2v2h-2zm-4-2h2v2h-2zm2 4h2v2h-2zm2-2h2v2h-2zm-4 4h6v2h-6z"/>
-                  </svg>
-                </div>
-                <div>
-                  <span className="text-[10px] text-slate-400 block">Kode Pelacakan:</span>
-                  <span className="font-mono text-sm font-bold text-cyan-400">{appointment.trackingCode}</span>
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  onClick={() => alert(`WhatsApp Simulation sent to ${appointment.phone}`)}
-                  className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-xs font-semibold text-white"
-                >
-                  Kirim ke WA
-                </button>
-                <button
-                  onClick={onDirectToReceptionist}
-                  className="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 rounded-xl text-xs font-semibold text-white"
-                >
-                  Uji di Lobi ➔
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // --- 3. MODUL DASBOR KEPALA SEKOLAH ---
-    function HostDashboardModule({ appointments, onUpdateAppointment }) {
-      const [activeModal, setActiveModal] = useState(null);
-      const [targetItem, setTargetItem] = useState(null);
-      const [selectedSlot, setSelectedSlot] = useState('08:30 - 09:15');
-
-      const isSlotConflicted = selectedSlot === '10:00 - 10:45';
-      const pendingAppointments = appointments.filter(a => a.status === 'PENDING');
-
-      const handleApprove = () => {
-        if (isSlotConflicted) return;
-        const [start, end] = selectedSlot.split(' - ');
-        onUpdateAppointment({
-          ...targetItem,
-          status: 'DISETUJUI',
-          startTime: start,
-          endTime: end,
-          roomLocation: 'Ruang Kepala Sekolah'
-        }, `Jadwal disetujui pada ${start} WIB.`);
-        setActiveModal(null);
-      };
-
-      return (
-        <div className="space-y-6">
-          <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 to-indigo-950 border border-slate-700 shadow-xl flex justify-between items-center">
-            <div>
-              <h2 className="text-xl font-bold text-white">Dr. H. Ahmad Sudrajat, M.Pd.</h2>
-              <p className="text-xs text-slate-400">Kepala SMAN 1 Prestasi Bangsa • Dasbor Triage & Approval</p>
-            </div>
-            <span className="px-3 py-1 rounded-full bg-cyan-950 border border-cyan-500/40 text-cyan-300 text-xs font-mono">
-              Auto-Sync Google Calendar
-            </span>
-          </div>
-
-          {/* Blocked Slot Notification */}
-          <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 text-xs space-y-1">
-            <span className="font-bold text-rose-400 block">🔒 Slot Terkunci Dinas Hari Ini:</span>
-            {BLOCKED_SCHEDULES.map((s, i) => (
-              <p key={i} className="text-slate-400 font-mono text-[11px]">• {s.start} - {s.end} WIB : {s.title}</p>
-            ))}
-          </div>
-
-          <div className="space-y-3">
-            <h3 className="text-sm font-bold text-white">Antrean Pengajuan Masuk ({pendingAppointments.length})</h3>
-            {pendingAppointments.length === 0 ? (
-              <div className="p-8 text-center rounded-2xl bg-slate-900/40 border border-slate-800 text-slate-400 text-xs">
-                Tidak ada permohonan yang menunggu.
-              </div>
-            ) : (
-              pendingAppointments.map(item => (
-                <div key={item.id} className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                  <div className="flex items-center gap-3">
-                    <img src={item.photoUrl} alt="" className="w-14 h-14 rounded-xl object-cover border border-cyan-400" />
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-white text-sm">{item.fullName}</span>
-                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-cyan-400">{item.trackingCode}</span>
-                      </div>
-                      <p className="text-xs text-slate-400">{item.institutionName} • "{item.purpose}"</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => { setTargetItem(item); setActiveModal('approve'); }}
-                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold"
-                    >
-                      ✓ Setujui
-                    </button>
-                    <button
-                      onClick={() => onUpdateAppointment({ ...item, status: 'DITOLAK' }, 'Permohonan ditolak.')}
-                      className="px-3 py-1.5 bg-rose-950 hover:bg-rose-900 border border-rose-800 text-rose-300 rounded-xl text-xs"
-                    >
-                      ✕ Tolak
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-
-          {activeModal === 'approve' && (
-            <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-              <div className="w-full max-w-md bg-slate-900 border border-slate-700 rounded-2xl p-5 space-y-4">
-                <h3 className="text-sm font-bold text-white">Konfirmasi Jadwal Audiensi</h3>
-                <div className="text-xs space-y-2">
-                  <label className="block text-slate-300">Pilih Slot Jam:</label>
-                  <select
-                    value={selectedSlot}
-                    onChange={(e) => setSelectedSlot(e.target.value)}
-                    className="w-full p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white font-mono"
-                  >
-                    <option value="08:30 - 09:15">08:30 - 09:15 WIB (Tersedia)</option>
-                    <option value="09:15 - 10:00">09:15 - 10:00 WIB (Tersedia)</option>
-                    <option value="10:00 - 10:45">10:00 - 10:45 WIB ⚠️ (BENTROK DINAS)</option>
-                  </select>
-
-                  {isSlotConflicted && (
-                    <p className="text-rose-400 font-bold">Slot bentrok dengan agenda dinas! Tombol persetujuan dikunci.</p>
-                  )}
-                </div>
-
-                <div className="flex justify-end gap-2 pt-2">
-                  <button onClick={() => setActiveModal(null)} className="px-3 py-1.5 bg-slate-800 text-slate-300 rounded-xl text-xs">Batal</button>
-                  <button
-                    onClick={handleApprove}
-                    disabled={isSlotConflicted}
-                    className={`px-4 py-1.5 rounded-xl text-xs font-bold text-white ${
-                      isSlotConflicted ? 'bg-slate-700 cursor-not-allowed text-slate-500' : 'bg-emerald-600 hover:bg-emerald-500'
-                    }`}
-                  >
-                    Kunci & Setujui
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    // --- 4. MODUL RESEPSIONIS TERMINAL LOBI ---
-    function ReceptionistTerminalModule({ appointments, onCheckIn, onCheckOut }) {
-      const [scannedCode, setScannedCode] = useState('SMT-2026-0813');
-      const activeGuest = appointments.find(a => a.trackingCode.toLowerCase() === scannedCode.trim().toLowerCase()) || appointments[0];
-      const isLate = activeGuest?.trackingCode === 'SMT-2026-0809';
-
-      return (
-        <div className="space-y-6">
-          <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-850 border border-slate-700 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <span className="text-[10px] font-mono text-cyan-400">TERMINAL 01 - MEJA DEPAN</span>
-              <h2 className="text-xl font-bold text-white">Scanner & Verifikasi Fisik Lobi</h2>
-            </div>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={scannedCode}
-                onChange={(e) => setScannedCode(e.target.value)}
-                placeholder="Kode Tiket..."
-                className="px-3 py-2 rounded-xl bg-slate-800 border border-cyan-500 text-cyan-300 font-mono text-xs focus:outline-none"
-              />
-            </div>
-          </div>
-
-          {isLate && (
-            <div className="p-4 rounded-xl bg-amber-950/80 border border-amber-500 text-amber-200 text-xs flex justify-between items-center">
-              <div>
-                <strong>JADWAL KEDALUWARSA (&gt;30 Menit).</strong> Konfirmasi dispensasi pimpinan sebelum check-in.
-              </div>
-              <button onClick={() => alert('WhatsApp terkirim ke pimpinan')} className="px-3 py-1 bg-amber-500 text-black font-bold rounded-lg text-xs">
-                Hubungi via WA
+              <button type="button" id="btnCapturePhoto" class="btn btn-blue" style="display:none;" onclick="takeSnapshot()">
+                ⚡ Ambil Foto
+              </button>
+              <button type="button" id="btnRetakePhoto" class="btn btn-secondary btn-sm" style="display:none;" onclick="retakePhoto()">
+                🔄 Foto Ulang
               </button>
             </div>
-          )}
 
-          {activeGuest && (
-            <div className="p-6 rounded-3xl bg-slate-900/80 border border-slate-700 shadow-2xl space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <span className="text-xs text-slate-300 font-semibold block mb-1">1. Foto Pendaftaran Web</span>
-                  <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-black border border-slate-700">
-                    <img src={activeGuest.photoUrl} alt="" className="w-full h-full object-cover" />
-                  </div>
-                </div>
-                <div>
-                  <span className="text-xs text-emerald-400 font-semibold block mb-1">2. Live Feed Kamera Lobi</span>
-                  <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-black border border-emerald-500/80 relative">
-                    <img src={activeGuest.photoUrl} alt="" className="w-full h-full object-cover filter contrast-105" />
-                    <div className="absolute inset-0 flex items-center justify-center border-2 border-emerald-400/50 m-4 rounded-2xl">
-                      <span className="bg-black/60 px-2 py-0.5 rounded text-[10px] font-mono text-emerald-400">MATCH 98.4%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-center pt-2">
-                <div>
-                  <span className="font-bold text-white text-sm block">{activeGuest.fullName}</span>
-                  <span className="text-xs text-cyan-400">{activeGuest.targetHost} • {activeGuest.roomLocation}</span>
-                </div>
-
-                <div className="flex gap-2">
-                  {activeGuest.status === 'DISETUJUI' && (
-                    <button
-                      onClick={() => onCheckIn(activeGuest.id)}
-                      className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs"
-                    >
-                      ✓ Check-in Masuk
-                    </button>
-                  )}
-                  {activeGuest.status === 'SEDANG BERLANGSUNG' && (
-                    <button
-                      onClick={() => onCheckOut(activeGuest.id)}
-                      className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs"
-                    >
-                      👋 Check-out Selesai
-                    </button>
-                  )}
-                  {activeGuest.status === 'SELESAI' && (
-                    <span className="text-xs text-slate-400 font-mono">Selesai: {activeGuest.checkOutTime}</span>
-                  )}
-                </div>
-              </div>
+            <!-- Fallback Mock Camera jika perangkat tidak mengizinkan akses kamera -->
+            <div id="cameraDeniedAlert" style="display:none; margin-top:0.75rem;">
+              <small style="color:var(--yellow-300); display:block; margin-bottom:0.4rem;">
+                ⚠️ Kamera tidak diizinkan atau tidak terdeteksi. Gunakan generator potret virtual untuk prototipe:
+              </small>
+              <button type="button" class="btn btn-yellow btn-sm" onclick="generateSimulatedCapture()">
+                🪄 Gunakan Foto Simulasi Prototipe
+              </button>
             </div>
-          )}
-        </div>
-      );
-    }
 
-    // --- 5. MODUL ANALITIK & AUDIT TRAIL UU PDP ---
-    function AnalyticsAuditModule({ appointments }) {
-      return (
-        <div className="space-y-6">
-          <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-blue-950 border border-blue-500/40 flex justify-between items-center">
-            <div>
-              <h3 className="text-sm font-bold text-white">Kepatuhan UU No. 27/2022 (UU PDP)</h3>
-              <p className="text-xs text-slate-300">Enkripsi TLS 1.3 • Presigned URL Storage • Retensi Otomatis 180 Hari</p>
-            </div>
-            <button onClick={() => alert('Ekspor PDF/XLSX Berhasil Disimpan')} className="px-3 py-1.5 bg-slate-800 border border-slate-600 text-white rounded-xl text-xs font-semibold">
-              📥 Ekspor Audit
+            <input type="hidden" id="faceSnapshotData" required />
+          </div>
+
+          <div style="text-align: right; margin-top: 1.25rem;">
+            <button type="submit" class="btn btn-blue" style="padding: 0.9rem 2.2rem; font-size: 1rem;">
+              🚀 Kirim Permohonan Janji Temu
             </button>
           </div>
+        </form>
+      </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[
-              { label: 'Total Tamu Pekan Ini', val: '48 Tamu' },
-              { label: 'Rata-rata Durasi', val: '28 Menit' },
-              { label: 'Ketepatan Waktu', val: '92.8%' },
-              { label: 'Integritas Log', val: '100% Valid' },
-            ].map((k, i) => (
-              <div key={i} className="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-                <span className="text-[10px] text-slate-400 block">{k.label}</span>
-                <span className="text-base font-bold text-cyan-400 mt-0.5 block font-mono">{k.val}</span>
-              </div>
-            ))}
+      <!-- Hasil Pendaftaran Langsung Berupa Tiket -->
+      <div id="successTicketCard" class="white-card" style="display:none; margin-top: 1.5rem; border: 3px solid var(--yellow-400);">
+        <div style="text-align:center;">
+          <div style="font-size: 3rem;">🎉</div>
+          <h2 style="color: var(--blue-900); font-weight: 800;">Permohonan Berhasil Dikirim!</h2>
+          <p style="color: var(--gray-700); font-size: 0.9rem;">
+            Simpan Kode Tiket berikut untuk melakukan pelacakan status janji temu Anda.
+          </p>
+
+          <div class="ticket-view">
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--gray-700);">KODE TIKET RESMI:</div>
+            <div class="ticket-number" id="issuedTicketCode">TKT-2026-XXXX</div>
+            <p id="issuedGuestDetail" style="font-size: 0.88rem; color: var(--blue-950); margin-top: 0.5rem;"></p>
+
+            <div class="qr-simulator-box" id="ticketQrPreview">
+              <!-- SVG QR Code Generator -->
+            </div>
+            <small style="color: var(--gray-500); font-size: 0.75rem;">Tunjukkan QR Code ini kepada Satpam/Lobi saat tiba di sekolah.</small>
           </div>
 
-          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 overflow-x-auto">
-            <h4 className="text-xs font-bold text-white mb-3">Audit Trail Log Kunjungan</h4>
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="text-[10px] text-slate-400 uppercase font-mono border-b border-slate-800">
+          <button class="btn btn-blue" style="margin-top: 1rem;" onclick="scrollToTracking()">
+            🔍 Periksa Status Sekarang
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 2. PORTAL PUBLIK: LACAK STATUS MANDIRI ================= -->
+    <section id="guest-tracking" class="portal-section">
+      <div class="yellow-card" style="max-width: 680px; margin: 0 auto;">
+        <div class="card-title-bar">
+          <div class="card-title">
+            <span>🔎</span> Lacak Status Permohonan Tamu
+          </div>
+          <span class="badge-accent">Self-Service</span>
+        </div>
+
+        <p style="color: var(--gray-700); font-size: 0.85rem; margin-bottom: 1rem;">
+          Masukkan Kode Tiket serta 4 digit terakhir nomor WhatsApp yang Anda gunakan saat mendaftar untuk verifikasi privasi.
+        </p>
+
+        <form onsubmit="handleTrackTicket(event)">
+          <div class="form-grid form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Kode Tiket</label>
+              <input type="text" id="trackTicketInput" class="form-control" placeholder="Contoh: TKT-2026-AB12" required style="text-transform: uppercase;" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">4 Digit Terakhir No. WA</label>
+              <input type="text" id="trackPhoneInput" class="form-control" placeholder="Contoh: 7890" maxlength="4" pattern="[0-9]{4}" required />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-blue" style="width: 100%; margin-top: 1rem;">
+            Cek Status Janji Temu
+          </button>
+        </form>
+
+        <!-- Hasil Pencarian Tracking -->
+        <div id="trackingResultBox" style="display:none; margin-top: 1.5rem;">
+          <!-- Diisi otomatis oleh JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 3. PORTAL ADMIN & KEPALA SEKOLAH (HOST PORTAL) ================= -->
+    <section id="host-portal" class="portal-section">
+
+      <!-- Sub-Tampilan A: Halaman Login Khusus -->
+      <div id="hostLoginBox" class="yellow-card" style="max-width: 440px; margin: 2rem auto;">
+        <div class="card-title-bar" style="justify-content: center; text-align: center;">
+          <div class="card-title" style="color: var(--blue-900);">
+            🔐 Login Portal Pimpinan
+          </div>
+        </div>
+
+        <p style="text-align: center; font-size: 0.82rem; color: var(--gray-700); margin-bottom: 1.25rem;">
+          Gunakan kredensial resmi pimpinan untuk mengelola dan menyetujui jadwal audiensi.
+        </p>
+
+        <form onsubmit="handleHostLogin(event)">
+          <div class="form-group" style="margin-bottom: 0.9rem;">
+            <label class="form-label">Username</label>
+            <input type="text" id="adminUsername" class="form-control" placeholder="Username" required />
+          </div>
+          <div class="form-group" style="margin-bottom: 0.9rem;">
+            <label class="form-label">Password</label>
+            <input type="password" id="adminPassword" class="form-control" placeholder="Password" required />
+          </div>
+
+          <div id="loginErrorMessage" style="display:none; color: var(--danger); font-size: 0.8rem; font-weight: 700; margin-bottom: 0.8rem;">
+            ❌ Username atau Password salah!
+          </div>
+
+          <button type="submit" class="btn btn-blue" style="width: 100%;">
+            Masuk ke Dashboard Pimpinan
+          </button>
+        </form>
+
+        <div style="margin-top: 1rem; padding: 0.75rem; background: var(--yellow-200); border-radius: var(--radius-sm); font-size: 0.75rem; color: var(--blue-950);">
+          <strong>Kredensial Statis Sesuai Instruksi:</strong><br />
+          Username: <code>kepsek123</code> | Password: <code>suki1234</code>
+        </div>
+      </div>
+
+      <!-- Sub-Tampilan B: Dashboard Kepala Sekolah (Tampil setelah login) -->
+      <div id="hostDashboardBox" style="display:none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 style="color: var(--blue-950); font-weight: 900;">Dashboard Agenda Kepala Sekolah</h2>
+            <p style="color: var(--gray-700); font-size: 0.85rem;">Selamat datang, Kepala Sekolah. Anda memiliki wewenang penuh atas permohonan audiensi.</p>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="handleHostLogout()">
+            🚪 Logout Sesi
+          </button>
+        </div>
+
+        <!-- Ringkasan Metrik Sesuai PRD -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-icon metric-blue">📊</div>
+            <div>
+              <div class="metric-value" id="metricTotal">0</div>
+              <div class="metric-label">Total Permohonan</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon metric-yellow">⏳</div>
+            <div>
+              <div class="metric-value" id="metricPending">0</div>
+              <div class="metric-label">Menunggu Review</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon metric-green">✅</div>
+            <div>
+              <div class="metric-value" id="metricApproved">0</div>
+              <div class="metric-label">Disetujui / Dijadwal</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon metric-blue">🏁</div>
+            <div>
+              <div class="metric-value" id="metricCompleted">0</div>
+              <div class="metric-label">Selesai / Checked-In</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabel Manajemen Janji Temu -->
+        <div class="white-card" style="padding: 1.25rem;">
+          <div class="card-title-bar">
+            <div class="card-title">
+              <span>📋</span> Daftar Antrean Permohonan Tamu
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <select id="filterStatus" class="form-control" style="padding: 0.35rem 0.7rem; font-size: 0.82rem;" onchange="renderAdminTable()">
+                <option value="ALL">Semua Status</option>
+                <option value="PENDING">Pending (Menunggu)</option>
+                <option value="APPROVED">Disetujui</option>
+                <option value="CHECKED_IN">Checked-In</option>
+                <option value="REJECTED">Ditolak</option>
+                <option value="COMPLETED">Selesai</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
                 <tr>
-                  <th className="p-2">Kode</th>
-                  <th className="p-2">Nama Tamu</th>
-                  <th className="p-2">Tujuan</th>
-                  <th className="p-2">Check-in</th>
-                  <th className="p-2">Check-out</th>
-                  <th className="p-2">Status</th>
+                  <th>Foto Live</th>
+                  <th>Kode Tiket</th>
+                  <th>Identitas Tamu</th>
+                  <th>Kategori</th>
+                  <th>Urgensi & Perihal</th>
+                  <th>Jadwal / Ruangan</th>
+                  <th>Status</th>
+                  <th>Aksi Pimpinan</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
-                {appointments.map(a => (
-                  <tr key={a.id} className="hover:bg-slate-800/30">
-                    <td className="p-2 font-mono text-cyan-400">{a.trackingCode}</td>
-                    <td className="p-2 font-semibold text-white">{a.fullName}</td>
-                    <td className="p-2">{a.targetHost}</td>
-                    <td className="p-2 font-mono text-emerald-400">{a.checkInTime || '-'}</td>
-                    <td className="p-2 font-mono text-blue-400">{a.checkOutTime || '-'}</td>
-                    <td className="p-2">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-cyan-300">
-                        {a.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+              <tbody id="adminTableBody">
+                <!-- Baris tabel dirender via renderAdminTable() -->
               </tbody>
             </table>
           </div>
         </div>
-      );
+      </div>
+
+    </section>
+
+    <!-- ================= 4. MODUL KIOS CHECK-IN RESEPSIONIS / SATPAM ================= -->
+    <section id="security-kiosk" class="portal-section">
+      <div class="yellow-card" style="max-width: 720px; margin: 0 auto;">
+        <div class="card-title-bar">
+          <div class="card-title">
+            <span>🛡️</span> Pos Keamanan & Simulator Check-in Lobi
+          </div>
+          <span class="badge-accent">Security Officer</span>
+        </div>
+
+        <p style="color: var(--gray-700); font-size: 0.85rem; margin-bottom: 1rem;">
+          Petugas keamanan / resepsionis memindai atau memasukkan Kode Tiket tamu fisik untuk memverifikasi kecocokan wajah pemohon dan mencatat kehadiran resmi.
+        </p>
+
+        <div class="scanner-box">
+          <h3 style="color: var(--yellow-400); margin-bottom: 0.5rem;">Pemindai Tiket Lobi</h3>
+          <div style="display:flex; gap:0.5rem; justify-content:center; max-width:400px; margin:0 auto;">
+            <input type="text" id="scanTicketInput" class="form-control" placeholder="Ketik/Pindai Kode Tiket" style="text-transform:uppercase;" />
+            <button class="btn btn-yellow" onclick="handleScanTicket()">Pindai</button>
+          </div>
+
+          <!-- Tampilan Verifikasi Wajah dan Detail -->
+          <div id="scanResultScreen" class="scanner-screen" style="display:none;">
+            <div style="display:flex; gap:1.25rem; align-items:center; text-align:left; flex-wrap:wrap; justify-content:center;">
+              <img id="scanFaceImg" src="" alt="Live Capture" style="width:110px; height:130px; object-fit:cover; border-radius:10px; border:3px solid var(--yellow-400);" />
+              <div style="flex:1; min-width:240px;">
+                <div style="display:flex; gap:0.5rem; align-items:center; margin-bottom:0.25rem;">
+                  <span id="scanTicketBadge" class="badge badge-approved">TKT-XXXX</span>
+                  <span id="scanStatusBadge" class="badge">STATUS</span>
+                </div>
+                <h3 id="scanGuestName" style="color:var(--yellow-300); font-size:1.2rem;">Nama Tamu</h3>
+                <p id="scanCategory" style="font-size:0.8rem; color:#cbd5e1;"></p>
+                <p id="scanSchedule" style="font-size:0.85rem; color:var(--white); margin-top:0.35rem;"></p>
+                <p id="scanRoom" style="font-weight:bold; color:var(--yellow-400); font-size:0.85rem;"></p>
+              </div>
+            </div>
+
+            <div style="margin-top:1.25rem; display:flex; gap:0.6rem; justify-content:center; flex-wrap:wrap;">
+              <button id="btnConfirmCheckin" class="btn btn-blue" onclick="confirmCheckin()">
+                ✅ Konfirmasi Kehadiran Fisik (Check-In)
+              </button>
+              <button id="btnConfirmCheckout" class="btn btn-secondary" onclick="confirmCheckout()">
+                🏁 Selesaikan Audiensi (Check-Out)
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= MODAL AKSI JADWAL (APPROVE & RESCHEDULE) ================= -->
+  <div id="scheduleModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="scheduleModalTitle">🗓️ Penetapan Jadwal Temu</div>
+        <button class="modal-close" onclick="closeModal('scheduleModal')">&times;</button>
+      </div>
+      <form onsubmit="handleScheduleSubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" id="modalAppointmentId" />
+          <input type="hidden" id="modalActionType" value="APPROVE" />
+
+          <div style="background:var(--yellow-100); padding:0.75rem; border-radius:var(--radius-sm); margin-bottom:1rem; font-size:0.85rem;">
+            <strong>Pemohon:</strong> <span id="modalGuestInfo">Bpk Ahmad (Wali Murid)</span><br />
+            <strong>Keperluan:</strong> <span id="modalPurposeInfo">Audiensi Beasiswa</span>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0.8rem;">
+            <label class="form-label">Pilih Ruangan Audiensi <span class="required">*</span></label>
+            <select id="modalRoom" class="form-control" required onchange="checkScheduleCollision()">
+              <option value="Ruang Tamu Utama Kepala Sekolah">Ruang Tamu Utama Kepala Sekolah</option>
+              <option value="Ruang Rapat Pimpinan (VIP)">Ruang Rapat Pimpinan (VIP)</option>
+              <option value="Ruang Konseling & Komite Sekolah">Ruang Konseling & Komite Sekolah</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0.8rem;">
+            <label class="form-label">Tanggal Pertemuan <span class="required">*</span></label>
+            <input type="date" id="modalDate" class="form-control" required onchange="checkScheduleCollision()" />
+          </div>
+
+          <div class="form-grid form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Jam Mulai <span class="required">*</span></label>
+              <input type="time" id="modalStartTime" class="form-control" required onchange="checkScheduleCollision()" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Jam Selesai <span class="required">*</span></label>
+              <input type="time" id="modalEndTime" class="form-control" required onchange="checkScheduleCollision()" />
+            </div>
+          </div>
+
+          <!-- Banner Deteksi Anti-Benturan (Collision Engine) -->
+          <div id="collisionAlert" class="conflict-banner">
+            <strong>⚠️ PERINGATAN BENTURAN JADWAL (COLLISION):</strong>
+            <p id="collisionText" style="margin-top:0.25rem;">Ruangan tersebut sudah terpakai pada rentang jam ini.</p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('scheduleModal')">Batal</button>
+          <button type="submit" id="btnSaveSchedule" class="btn btn-blue">Simpan & Terbitkan Jadwal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL PENOLAKAN DENGAN ALASAN WAJIB ================= -->
+  <div id="rejectModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header" style="background:var(--danger);">
+        <div class="modal-title" style="color:var(--white);">🚫 Tolak Permohonan Tamu</div>
+        <button class="modal-close" onclick="closeModal('rejectModal')">&times;</button>
+      </div>
+      <form onsubmit="handleRejectSubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" id="rejectAppointmentId" />
+          <p style="font-size:0.85rem; color:var(--gray-700); margin-bottom:0.8rem;">
+            Sesuai regulasi FR-NOTIF-01: Penolakan wajib menyertakan alasan resmi yang akan diteruskan kepada pihak tamu.
+          </p>
+
+          <div class="form-group">
+            <label class="form-label">Alasan Penolakan <span class="required">*</span></label>
+            <textarea id="rejectionReasonInput" class="form-control" placeholder="Contoh: Kepala Sekolah sedang menghadiri rapat dinas provinsi luar kota..." required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('rejectModal')">Batal</button>
+          <button type="submit" class="btn btn-danger">Konfirmasi Penolakan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL LIHAT FOTO DETAIL ================= -->
+  <div id="photoModal" class="modal-overlay" onclick="closeModal('photoModal')">
+    <div class="modal-box" style="max-width:380px; text-align:center; padding:1.25rem;">
+      <h3 style="color:var(--blue-900); margin-bottom:0.75rem;">Potret Live Capture</h3>
+      <img id="enlargedPhoto" src="" alt="Biometrik Wajah" style="width:100%; border-radius:12px; border:3px solid var(--yellow-400);" />
+      <button class="btn btn-blue btn-sm" style="margin-top:1rem;" onclick="closeModal('photoModal')">Tutup</button>
+    </div>
+  </div>
+
+  <!-- ================= TOAST NOTIFICATION CONTAINER ================= -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- ================= JAVASCRIPT LOGIC LENGKAP & MANDIRI ================= -->
+  <script>
+    /* ==========================================================================
+       1. KONFIGURASI GLOBAL & VARIABEL LOGO SEKOLAH
+       ========================================================================== */
+    // Variabel Logo Sekolah (Dapat Anda ubah ke URL foto lokal / hosting Anda sendiri)
+    // Contoh: const SCHOOL_LOGO_CONFIG = "img/logo-sekolah-anda.png";
+    const SCHOOL_LOGO_CONFIG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon points='50,5 95,25 95,75 50,95 5,75 5,25' fill='%231e3a8a' stroke='%23facc15' stroke-width='6'/><polygon points='50,15 85,32 85,68 50,85 15,68 15,32' fill='%23facc15'/><text x='50' y='58' font-size='38' text-anchor='middle' fill='%230f274a' font-family='sans-serif' font-weight='900'>S</text></svg>";
+    const SCHOOL_NAME_CONFIG = "SMA NEGERI TERPADU INDONESIA";
+
+    // Inisialisasi Logo ke Header
+    document.addEventListener("DOMContentLoaded", () => {
+      const logoEl = document.getElementById("schoolLogoElement");
+      const nameEl = document.getElementById("displaySchoolName");
+      if (logoEl) logoEl.src = SCHOOL_LOGO_CONFIG;
+      if (nameEl) nameEl.textContent = SCHOOL_NAME_CONFIG;
+
+      // Set tanggal default ke hari ini
+      const today = new Date().toISOString().split("T")[0];
+      const reqDateInput = document.getElementById("requestedDate");
+      if (reqDateInput) reqDateInput.min = today;
+
+      initDataStore();
+      updateDashboardMetrics();
+      renderAdminTable();
+    });
+
+    /* ==========================================================================
+       2. DATA STORAGE (LOCALSTORAGE DENGAN BENIH AWAL / SEED DATA REALISTIS)
+       ========================================================================== */
+    const STORAGE_KEY = "si_tamu_appointments_v1";
+
+    function initDataStore() {
+      if (!localStorage.getItem(STORAGE_KEY)) {
+        const seedData = [
+          {
+            id: "seed-1",
+            ticketCode: "TKT-2026-X8K9",
+            category: "WALI_MURID",
+            fullName: "Hj. Siti Rahmawati",
+            phone: "081234567890",
+            parentOfStudent: "Dimas Aditya Pratama",
+            studentClass: "X MIPA 2",
+            institutionName: "-",
+            officeAddress: "-",
+            studentNisn: "-",
+            urgency: "IMPORTANT",
+            purpose: "Konsultasi rencana program beasiswa riset luar negeri siswa.",
+            faceSnapshot: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='200'><rect width='100%25' height='100%25' fill='%231e3a8a'/><circle cx='80' cy='70' r='40' fill='%23fde047'/><circle cx='70' cy='65' r='5' fill='%23000'/><circle cx='90' cy='65' r='5' fill='%23000'/><path d='M70,85 Q80,95 90,85' stroke='%23000' stroke-width='3' fill='none'/><rect x='40' y='125' width='80' height='60' rx='20' fill='%23facc15'/></svg>",
+            requestedDate: "2026-09-15",
+            status: "APPROVED",
+            scheduledDate: "2026-09-15",
+            scheduledStart: "09:00",
+            scheduledEnd: "10:00",
+            room: "Ruang Tamu Utama Kepala Sekolah",
+            rejectionReason: "",
+            checkInAt: null,
+            createdAt: "2026-09-14 08:30:00"
+          },
+          {
+            id: "seed-2",
+            ticketCode: "TKT-2026-P9Q1",
+            category: "INSTANSI",
+            fullName: "Ir. Bambang Trihatmojo",
+            phone: "085678901234",
+            parentOfStudent: "-",
+            studentClass: "-",
+            institutionName: "Balai Riset & Standardisasi Industri",
+            officeAddress: "Jl. Diponegoro No. 45 Surabaya",
+            studentNisn: "-",
+            urgency: "NORMAL",
+            purpose: "Penjajakan kerja sama laboratorium vokasi dan penyuluhan kurikulum industri.",
+            faceSnapshot: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='200'><rect width='100%25' height='100%25' fill='%230f274a'/><circle cx='80' cy='70' r='40' fill='%23facc15'/><circle cx='70' cy='65' r='5' fill='%23000'/><circle cx='90' cy='65' r='5' fill='%23000'/><path d='M70,85 Q80,95 90,85' stroke='%23000' stroke-width='3' fill='none'/><rect x='40' y='125' width='80' height='60' rx='20' fill='%2360a5fa'/></svg>",
+            requestedDate: "2026-09-16",
+            status: "PENDING",
+            scheduledDate: "",
+            scheduledStart: "",
+            scheduledEnd: "",
+            room: "",
+            rejectionReason: "",
+            checkInAt: null,
+            createdAt: "2026-09-15 07:15:00"
+          }
+        ];
+        saveAllAppointments(seedData);
+      }
     }
 
-    // Render ke Root DOM
-    ReactDOM.createRoot(document.getElementById('root')).render(<SIMTADIKApp />);
+    function getAllAppointments() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    }
+
+    function saveAllAppointments(data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      updateDashboardMetrics();
+    }
+
+    /* ==========================================================================
+       3. SISTEM NAVIGASI PORTAL
+       ========================================================================== */
+    function switchPortal(targetSectionId) {
+      // Hentikan kamera jika user berpindah tab
+      stopCameraStream();
+
+      document.querySelectorAll(".portal-section").forEach(sec => sec.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+
+      const targetEl = document.getElementById(targetSectionId);
+      if (targetEl) targetEl.classList.add("active");
+
+      // Set active button
+      const buttons = document.querySelectorAll(".tab-btn");
+      if (targetSectionId === 'guest-registration') buttons[0].classList.add("active");
+      if (targetSectionId === 'guest-tracking') buttons[1].classList.add("active");
+      if (targetSectionId === 'host-portal') {
+        buttons[2].classList.add("active");
+        checkHostAuthSession();
+      }
+      if (targetSectionId === 'security-kiosk') buttons[3].classList.add("active");
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    /* ==========================================================================
+       4. FORM ADAPTIF KATEGORI TAMU
+       ========================================================================== */
+    function renderAdaptiveFields() {
+      const category = document.getElementById("guestCategory").value;
+      const container = document.getElementById("adaptiveFieldContainer");
+      const labelFullName = document.getElementById("labelFullName");
+
+      if (!category) {
+        container.style.display = "none";
+        return;
+      }
+
+      container.style.display = "block";
+      let html = "";
+
+      if (category === "SISWA") {
+        labelFullName.innerHTML = 'Nama Lengkap Siswa <span class="required">*</span>';
+        html = `
+          <div class="form-grid form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Kelas Siswa <span class="required">*</span></label>
+              <input type="text" id="adaptStudentClass" class="form-control" placeholder="Contoh: X MIPA 1 / XI IPS 2" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">NISN Siswa <span class="required">*</span></label>
+              <input type="text" id="adaptStudentNisn" class="form-control" placeholder="10 Digit NISN Resmi" pattern="[0-9]{10}" required />
+            </div>
+          </div>
+        `;
+      } else if (category === "WALI_MURID") {
+        labelFullName.innerHTML = 'Nama Lengkap Orang Tua / Wali <span class="required">*</span>';
+        html = `
+          <div class="form-grid form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Nama Siswa yang Diwakili <span class="required">*</span></label>
+              <input type="text" id="adaptParentOfStudent" class="form-control" placeholder="Nama putra/putri Anda" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Kelas Siswa <span class="required">*</span></label>
+              <input type="text" id="adaptStudentClass" class="form-control" placeholder="Contoh: XII IPA 3" required />
+            </div>
+          </div>
+        `;
+      } else if (category === "INSTANSI") {
+        labelFullName.innerHTML = 'Nama Lengkap Utusan / Tamu <span class="required">*</span>';
+        html = `
+          <div class="form-grid form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Nama Instansi / Kantor / Lembaga <span class="required">*</span></label>
+              <input type="text" id="adaptInstitutionName" class="form-control" placeholder="Contoh: Dinas Pendidikan / PT Telkom" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Alamat Kantor Instansi <span class="required">*</span></label>
+              <input type="text" id="adaptOfficeAddress" class="form-control" placeholder="Alamat kantor perwakilan" required />
+            </div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+    }
+
+    /* ==========================================================================
+       5. MODUL LIVE WEBRTC CAMERA CAPTURE (TANPA FILE PICKER)
+       ========================================================================== */
+    let localStream = null;
+
+    async function startCamera() {
+      const video = document.getElementById("cameraVideo");
+      const silhouette = document.getElementById("silhouetteGuide");
+      const btnOpen = document.getElementById("btnOpenCamera");
+      const btnCapture = document.getElementById("btnCapturePhoto");
+      const btnRetake = document.getElementById("btnRetakePhoto");
+      const previewImg = document.getElementById("snapshotImagePreview");
+      const deniedAlert = document.getElementById("cameraDeniedAlert");
+
+      // Reset preview
+      previewImg.style.display = "none";
+      video.style.display = "block";
+      deniedAlert.style.display = "none";
+
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          throw new Error("Peramban tidak mendukung WebRTC Camera.");
+        }
+
+        localStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
+          audio: false
+        });
+
+        video.srcObject = localStream;
+        await video.play();
+
+        silhouette.style.display = "block";
+        btnOpen.style.display = "none";
+        btnCapture.style.display = "inline-flex";
+        btnRetake.style.display = "none";
+        showToast("Kamera aktif. Arahkan wajah ke siluet oval.");
+      } catch (err) {
+        console.warn("Camera Error:", err);
+        deniedAlert.style.display = "block";
+        showToast("Gagal mengakses kamera langsung: " + err.message, "danger");
+      }
+    }
+
+    function stopCameraStream() {
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+      }
+    }
+
+    function takeSnapshot() {
+      const video = document.getElementById("cameraVideo");
+      const canvas = document.getElementById("cameraCanvas");
+      const previewImg = document.getElementById("snapshotImagePreview");
+      const silhouette = document.getElementById("silhouetteGuide");
+      const hiddenInput = document.getElementById("faceSnapshotData");
+      const btnCapture = document.getElementById("btnCapturePhoto");
+      const btnRetake = document.getElementById("btnRetakePhoto");
+
+      if (!video.videoWidth) {
+        showToast("Kamera belum siap merekam frame.", "danger");
+        return;
+      }
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d");
+
+      // Efek horizontal flip agar sesuai preview cermin
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Konversi ke Base64 (Format JPEG kualitas 0.85)
+      const base64Data = canvas.toDataURL("image/jpeg", 0.85);
+      hiddenInput.value = base64Data;
+
+      // Render ke preview
+      previewImg.src = base64Data;
+      previewImg.style.display = "block";
+      video.style.display = "none";
+      silhouette.style.display = "none";
+
+      stopCameraStream();
+
+      btnCapture.style.display = "none";
+      btnRetake.style.display = "inline-flex";
+      showToast("Foto berhasil diambil!");
+    }
+
+    function retakePhoto() {
+      document.getElementById("faceSnapshotData").value = "";
+      startCamera();
+    }
+
+    // Fallback Mock Portrait (Jika perangkat tanpa webcam / ijin ditolak)
+    function generateSimulatedCapture() {
+      const hiddenInput = document.getElementById("faceSnapshotData");
+      const previewImg = document.getElementById("snapshotImagePreview");
+      const video = document.getElementById("cameraVideo");
+      const silhouette = document.getElementById("silhouetteGuide");
+      const btnRetake = document.getElementById("btnRetakePhoto");
+      const btnCapture = document.getElementById("btnCapturePhoto");
+      const btnOpen = document.getElementById("btnOpenCamera");
+
+      const canvas = document.createElement("canvas");
+      canvas.width = 320;
+      canvas.height = 320;
+      const ctx = canvas.getContext("2d");
+
+      // Gambar background & avatar siluet
+      ctx.fillStyle = "#0f274a";
+      ctx.fillRect(0, 0, 320, 320);
+      ctx.fillStyle = "#facc15";
+      ctx.beginPath();
+      ctx.arc(160, 120, 60, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(160, 260, 100, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#0f274a";
+      ctx.font = "bold 14px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("SIMULATED BIO-CAPTURE", 160, 305);
+
+      const mockBase64 = canvas.toDataURL("image/jpeg", 0.9);
+      hiddenInput.value = mockBase64;
+      previewImg.src = mockBase64;
+      previewImg.style.display = "block";
+      video.style.display = "none";
+      silhouette.style.display = "none";
+
+      btnOpen.style.display = "none";
+      btnCapture.style.display = "none";
+      btnRetake.style.display = "inline-flex";
+      showToast("Foto simulasi biometrik berhasil dimuat.");
+    }
+
+    /* ==========================================================================
+       6. PENGAJUAN FORMULIR & GENERASI KODE TIKET
+       ========================================================================== */
+    function generateCrypticTicket() {
+      const year = new Date().getFullYear();
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      let randomPart = "";
+      for (let i = 0; i < 4; i++) {
+        randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return `TKT-${year}-${randomPart}`;
+    }
+
+    function handleGuestSubmit(event) {
+      event.preventDefault();
+
+      const snapshot = document.getElementById("faceSnapshotData").value;
+      if (!snapshot) {
+        showToast("Wajib mengambil foto wajah melalui Live Camera!", "danger");
+        return;
+      }
+
+      const category = document.getElementById("guestCategory").value;
+      const fullName = document.getElementById("fullName").value.trim();
+      const phone = document.getElementById("whatsappNumber").value.trim();
+      const urgency = document.getElementById("urgencyLevel").value;
+      const requestedDate = document.getElementById("requestedDate").value;
+      const purpose = document.getElementById("purpose").value.trim();
+
+      // Field dinamis
+      let studentClass = document.getElementById("adaptStudentClass") ? document.getElementById("adaptStudentClass").value.trim() : "-";
+      let studentNisn = document.getElementById("adaptStudentNisn") ? document.getElementById("adaptStudentNisn").value.trim() : "-";
+      let parentOfStudent = document.getElementById("adaptParentOfStudent") ? document.getElementById("adaptParentOfStudent").value.trim() : "-";
+      let institutionName = document.getElementById("adaptInstitutionName") ? document.getElementById("adaptInstitutionName").value.trim() : "-";
+      let officeAddress = document.getElementById("adaptOfficeAddress") ? document.getElementById("adaptOfficeAddress").value.trim() : "-";
+
+      const ticketCode = generateCrypticTicket();
+
+      const newRecord = {
+        id: "app-" + Date.now(),
+        ticketCode: ticketCode,
+        category: category,
+        fullName: fullName,
+        phone: phone,
+        studentClass: studentClass,
+        studentNisn: studentNisn,
+        parentOfStudent: parentOfStudent,
+        institutionName: institutionName,
+        officeAddress: officeAddress,
+        urgency: urgency,
+        purpose: purpose,
+        faceSnapshot: snapshot,
+        requestedDate: requestedDate,
+        status: "PENDING",
+        scheduledDate: "",
+        scheduledStart: "",
+        scheduledEnd: "",
+        room: "",
+        rejectionReason: "",
+        checkInAt: null,
+        createdAt: new Date().toLocaleString("id-ID")
+      };
+
+      const all = getAllAppointments();
+      all.unshift(newRecord);
+      saveAllAppointments(all);
+
+      // Tampilkan Kartu Sukses
+      document.getElementById("issuedTicketCode").textContent = ticketCode;
+      document.getElementById("issuedGuestDetail").textContent = `${fullName} (${category}) - Keperluan: ${purpose.substring(0, 50)}...`;
+      renderSimpleQrSvg("ticketQrPreview", ticketCode);
+
+      document.getElementById("successTicketCard").style.display = "block";
+      document.getElementById("appointmentForm").reset();
+      document.getElementById("adaptiveFieldContainer").style.display = "none";
+      document.getElementById("snapshotImagePreview").style.display = "none";
+      document.getElementById("btnOpenCamera").style.display = "inline-flex";
+      document.getElementById("btnCapturePhoto").style.display = "none";
+      document.getElementById("btnRetakePhoto").style.display = "none";
+      document.getElementById("faceSnapshotData").value = "";
+
+      showToast("Permohonan berhasil disimpan!");
+      document.getElementById("successTicketCard").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function scrollToTracking() {
+      const code = document.getElementById("issuedTicketCode").textContent;
+      switchPortal("guest-tracking");
+      document.getElementById("trackTicketInput").value = code;
+    }
+
+    /* ==========================================================================
+       7. LACAK STATUS MANDIRI (TIKET + 4 DIGIT WA)
+       ========================================================================== */
+    function handleTrackTicket(event) {
+      event.preventDefault();
+      const codeInput = document.getElementById("trackTicketInput").value.trim().toUpperCase();
+      const phoneDigits = document.getElementById("trackPhoneInput").value.trim();
+      const resultBox = document.getElementById("trackingResultBox");
+
+      const all = getAllAppointments();
+      const match = all.find(item => item.ticketCode === codeInput);
+
+      if (!match) {
+        resultBox.style.display = "block";
+        resultBox.innerHTML = `
+          <div style="background:var(--danger-bg); border:2px solid var(--danger); padding:1rem; border-radius:var(--radius-md); color:#991b1b; text-align:center;">
+            ❌ Tiket <strong>${codeInput}</strong> tidak ditemukan dalam sistem.
+          </div>`;
+        return;
+      }
+
+      // Validasi 4 Digit Terakhir No HP
+      const cleanPhone = match.phone.replace(/\D/g, "");
+      const lastFour = cleanPhone.slice(-4);
+
+      if (lastFour !== phoneDigits) {
+        resultBox.style.display = "block";
+        resultBox.innerHTML = `
+          <div style="background:var(--danger-bg); border:2px solid var(--danger); padding:1rem; border-radius:var(--radius-md); color:#991b1b; text-align:center;">
+            ❌ 4 Digit terakhir nomor WhatsApp tidak cocok dengan data pendaftar tiket ini!
+          </div>`;
+        return;
+      }
+
+      // Render Detail Tiket
+      let statusColorBadge = "badge-pending";
+      if (match.status === "APPROVED") statusColorBadge = "badge-approved";
+      if (match.status === "REJECTED") statusColorBadge = "badge-rejected";
+      if (match.status === "CHECKED_IN") statusColorBadge = "badge-checked_in";
+
+      let scheduleInfo = "";
+      if (match.status === "APPROVED" || match.status === "CHECKED_IN") {
+        scheduleInfo = `
+          <div style="margin-top:0.75rem; padding:0.75rem; background:var(--yellow-200); border-radius:var(--radius-sm);">
+            <strong>📍 Ruangan:</strong> ${match.room}<br />
+            <strong>🗓️ Tanggal & Jam:</strong> ${match.scheduledDate} (${match.scheduledStart} - ${match.scheduledEnd} WIB)
+          </div>
+        `;
+      } else if (match.status === "REJECTED") {
+        scheduleInfo = `
+          <div style="margin-top:0.75rem; padding:0.75rem; background:var(--danger-bg); color:#991b1b; border-radius:var(--radius-sm);">
+            <strong>Alasan Penolakan:</strong><br />
+            ${match.rejectionReason}
+          </div>
+        `;
+      }
+
+      resultBox.style.display = "block";
+      resultBox.innerHTML = `
+        <div class="white-card" style="border: 2px solid var(--yellow-400);">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--yellow-200); padding-bottom:0.5rem;">
+            <div>
+              <span class="badge ${statusColorBadge}">${match.status}</span>
+              <strong style="margin-left:0.5rem; color:var(--blue-900); font-size:1.1rem;">${match.ticketCode}</strong>
+            </div>
+            <span class="urgency-pill urgency-${match.urgency.toLowerCase()}">${match.urgency}</span>
+          </div>
+
+          <div style="display:flex; gap:1rem; margin-top:1rem; align-items:center;">
+            <img src="${match.faceSnapshot}" style="width:70px; height:85px; object-fit:cover; border-radius:8px; border:2px solid var(--yellow-400);" />
+            <div>
+              <h4 style="color:var(--blue-950);">${maskName(match.fullName)}</h4>
+              <p style="font-size:0.8rem; color:var(--gray-700);">No. WA: ${maskPhone(match.phone)}</p>
+              <p style="font-size:0.85rem; color:var(--blue-900); font-weight:600; margin-top:3px;">
+                Keperluan: ${match.purpose}
+              </p>
+            </div>
+          </div>
+
+          ${scheduleInfo}
+
+          <div class="qr-simulator-box" id="trackQrBox" style="margin-top:1rem;"></div>
+          <small style="color:var(--gray-500); display:block; text-align:center;">QR Code Otentikasi Kehadiran Lobi</small>
+        </div>
+      `;
+
+      renderSimpleQrSvg("trackQrBox", match.ticketCode);
+    }
+
+    function maskName(name) {
+      if (name.length <= 4) return name;
+      return name.substring(0, 3) + "***" + name.slice(-1);
+    }
+
+    function maskPhone(phone) {
+      if (phone.length <= 6) return phone;
+      return phone.substring(0, 4) + "****" + phone.slice(-4);
+    }
+
+    /* ==========================================================================
+       8. AUTENTIKASI HOST PORTAL (KEPALA SEKOLAH)
+       ========================================================================== */
+    const AUTH_SESSION_KEY = "si_tamu_host_logged_in";
+
+    function checkHostAuthSession() {
+      const isAuth = sessionStorage.getItem(AUTH_SESSION_KEY) === "true";
+      document.getElementById("hostLoginBox").style.display = isAuth ? "none" : "block";
+      document.getElementById("hostDashboardBox").style.display = isAuth ? "block" : "none";
+      if (isAuth) {
+        updateDashboardMetrics();
+        renderAdminTable();
+      }
+    }
+
+    function handleHostLogin(event) {
+      event.preventDefault();
+      const u = document.getElementById("adminUsername").value.trim();
+      const p = document.getElementById("adminPassword").value.trim();
+      const err = document.getElementById("loginErrorMessage");
+
+      // Validasi statis sesuai instruksi: kepsek123 & suki1234
+      if (u === "kepsek123" && p === "suki1234") {
+        err.style.display = "none";
+        sessionStorage.setItem(AUTH_SESSION_KEY, "true");
+        showToast("Login Pimpinan Berhasil!");
+        checkHostAuthSession();
+      } else {
+        err.style.display = "block";
+        showToast("Kredensial login salah!", "danger");
+      }
+    }
+
+    function handleHostLogout() {
+      sessionStorage.removeItem(AUTH_SESSION_KEY);
+      showToast("Sesi pimpinan telah diakhiri.");
+      checkHostAuthSession();
+    }
+
+    /* ==========================================================================
+       9. DASHBOARD METRICS & TABEL MANAJEMEN KEPALA SEKOLAH
+       ========================================================================== */
+    function updateDashboardMetrics() {
+      const all = getAllAppointments();
+      const total = all.length;
+      const pending = all.filter(a => a.status === "PENDING").length;
+      const approved = all.filter(a => a.status === "APPROVED").length;
+      const completed = all.filter(a => a.status === "CHECKED_IN" || a.status === "COMPLETED").length;
+
+      const elTotal = document.getElementById("metricTotal");
+      const elPending = document.getElementById("metricPending");
+      const elApproved = document.getElementById("metricApproved");
+      const elCompleted = document.getElementById("metricCompleted");
+      const pendingBadge = document.getElementById("pendingCountBadge");
+
+      if (elTotal) elTotal.textContent = total;
+      if (elPending) elPending.textContent = pending;
+      if (elApproved) elApproved.textContent = approved;
+      if (elCompleted) elCompleted.textContent = completed;
+      if (pendingBadge) pendingBadge.textContent = `${pending} Pending`;
+    }
+
+    function renderAdminTable() {
+      const tbody = document.getElementById("adminTableBody");
+      if (!tbody) return;
+
+      const filter = document.getElementById("filterStatus").value;
+      let data = getAllAppointments();
+
+      if (filter !== "ALL") {
+        data = data.filter(d => d.status === filter);
+      }
+
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--gray-500);">Tidak ada permohonan data janji temu.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.map(item => {
+        let metaDetail = "";
+        if (item.category === "SISWA") metaDetail = `Kelas: ${item.studentClass} | NISN: ${item.studentNisn}`;
+        if (item.category === "WALI_MURID") metaDetail = `Wali dari: ${item.parentOfStudent} (${item.studentClass})`;
+        if (item.category === "INSTANSI") metaDetail = `Instansi: ${item.institutionName} | Alamat: ${item.officeAddress}`;
+
+        let scheduleStr = "-";
+        if (item.scheduledDate) {
+          scheduleStr = `<div><strong>${item.scheduledDate}</strong></div><small>${item.scheduledStart} - ${item.scheduledEnd}</small><div style="font-size:0.75rem; color:var(--blue-800);">${item.room}</div>`;
+        }
+
+        return `
+          <tr>
+            <td>
+              <img src="${item.faceSnapshot}" class="avatar-preview" title="Klik perbesar" onclick="openPhotoModal('${item.faceSnapshot}')" />
+            </td>
+            <td>
+              <strong style="color:var(--blue-900); font-family:monospace;">${item.ticketCode}</strong><br />
+              <small style="color:var(--gray-500);">${item.createdAt}</small>
+            </td>
+            <td>
+              <div style="font-weight:700; color:var(--blue-950);">${item.fullName}</div>
+              <div style="font-size:0.75rem; color:var(--gray-500);">${item.phone}</div>
+              <div style="font-size:0.72rem; color:var(--yellow-700); font-weight:600;">${metaDetail}</div>
+            </td>
+            <td>
+              <span class="badge" style="background:var(--yellow-200); color:var(--yellow-700);">${item.category}</span>
+            </td>
+            <td>
+              <span class="urgency-pill urgency-${item.urgency.toLowerCase()}">${item.urgency}</span>
+              <p style="font-size:0.8rem; margin-top:4px; max-width:200px;">${item.purpose}</p>
+            </td>
+            <td>${scheduleStr}</td>
+            <td>
+              <span class="badge badge-${item.status.toLowerCase()}">${item.status}</span>
+            </td>
+            <td>
+              <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                ${item.status === 'PENDING' ? `
+                  <button class="btn btn-blue btn-sm" onclick="openScheduleModal('${item.id}', 'APPROVE')">Setujui</button>
+                  <button class="btn btn-danger btn-sm" onclick="openRejectModal('${item.id}')">Tolak</button>
+                ` : ''}
+                ${item.status === 'APPROVED' ? `
+                  <button class="btn btn-yellow btn-sm" onclick="openScheduleModal('${item.id}', 'RESCHEDULE')">Reschedule</button>
+                  <button class="btn btn-danger btn-sm" onclick="openRejectModal('${item.id}')">Batal</button>
+                ` : ''}
+                ${item.status === 'CHECKED_IN' ? `
+                  <button class="btn btn-secondary btn-sm" onclick="directComplete('${item.id}')">Selesai</button>
+                ` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    /* ==========================================================================
+       10. VALIDASI JADWAL ANTI-BENTURAN (ANTI-COLLISION ENGINE)
+       ========================================================================== */
+    function checkScheduleCollision() {
+      const modalId = document.getElementById("modalAppointmentId").value;
+      const date = document.getElementById("modalDate").value;
+      const start = document.getElementById("modalStartTime").value;
+      const end = document.getElementById("modalEndTime").value;
+      const room = document.getElementById("modalRoom").value;
+      const alertBox = document.getElementById("collisionAlert");
+      const alertText = document.getElementById("collisionText");
+      const btnSave = document.getElementById("btnSaveSchedule");
+
+      if (!date || !start || !end || !room) {
+        alertBox.style.display = "none";
+        btnSave.disabled = false;
+        return false;
+      }
+
+      if (start >= end) {
+        alertBox.style.display = "block";
+        alertText.textContent = "Jam Mulai harus lebih awal daripada Jam Selesai!";
+        btnSave.disabled = true;
+        return true;
+      }
+
+      // Cari benturan dengan appointment APPROVED atau CHECKED_IN di ruangan dan tanggal sama
+      const all = getAllAppointments();
+      const conflict = all.find(item => {
+        if (item.id === modalId) return false; // Jangan bandingkan dengan diri sendiri
+        if (item.status !== "APPROVED" && item.status !== "CHECKED_IN") return false;
+        if (item.scheduledDate !== date || item.room !== room) return false;
+
+        // Formula Collision Overlap: (StartA < EndB) && (EndA > StartB)
+        const isOverlap = (start < item.scheduledEnd) && (end > item.scheduledStart);
+        return isOverlap;
+      });
+
+      if (conflict) {
+        alertBox.style.display = "block";
+        alertText.innerHTML = `Slot BENTROK dengan <strong>${conflict.fullName}</strong> (${conflict.ticketCode}) pada jam <strong>${conflict.scheduledStart} - ${conflict.scheduledEnd} WIB</strong> di ${room}.`;
+        btnSave.disabled = true;
+        return true;
+      } else {
+        alertBox.style.display = "none";
+        btnSave.disabled = false;
+        return false;
+      }
+    }
+
+    function openScheduleModal(appointmentId, actionType) {
+      const all = getAllAppointments();
+      const item = all.find(a => a.id === appointmentId);
+      if (!item) return;
+
+      document.getElementById("modalAppointmentId").value = item.id;
+      document.getElementById("modalActionType").value = actionType;
+      document.getElementById("modalGuestInfo").textContent = `${item.fullName} (${item.category})`;
+      document.getElementById("modalPurposeInfo").textContent = item.purpose;
+
+      document.getElementById("scheduleModalTitle").textContent = actionType === "APPROVE" ? "🗓️ Setujui & Jadwalkan Janji Temu" : "🔄 Reschedule Waktu Temu";
+
+      // Isi tanggal & jam default
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const defaultDate = item.scheduledDate || item.requestedDate || tomorrow.toISOString().split("T")[0];
+
+      document.getElementById("modalDate").value = defaultDate;
+      document.getElementById("modalStartTime").value = item.scheduledStart || "09:00";
+      document.getElementById("modalEndTime").value = item.scheduledEnd || "10:00";
+      if (item.room) document.getElementById("modalRoom").value = item.room;
+
+      checkScheduleCollision();
+      document.getElementById("scheduleModal").classList.add("active");
+    }
+
+    function handleScheduleSubmit(event) {
+      event.preventDefault();
+      if (checkScheduleCollision()) {
+        showToast("Jadwal bentrok! Silakan ganti jam atau ruangan.", "danger");
+        return;
+      }
+
+      const id = document.getElementById("modalAppointmentId").value;
+      const actionType = document.getElementById("modalActionType").value;
+      const room = document.getElementById("modalRoom").value;
+      const date = document.getElementById("modalDate").value;
+      const start = document.getElementById("modalStartTime").value;
+      const end = document.getElementById("modalEndTime").value;
+
+      const all = getAllAppointments();
+      const item = all.find(a => a.id === id);
+      if (item) {
+        item.status = "APPROVED";
+        item.room = room;
+        item.scheduledDate = date;
+        item.scheduledStart = start;
+        item.scheduledEnd = end;
+        saveAllAppointments(all);
+        renderAdminTable();
+        closeModal("scheduleModal");
+        showToast(actionType === "APPROVE" ? "Pertemuan berhasil disetujui & dijadwalkan!" : "Jadwal berhasil di-reschedule!");
+      }
+    }
+
+    function openRejectModal(appointmentId) {
+      document.getElementById("rejectAppointmentId").value = appointmentId;
+      document.getElementById("rejectionReasonInput").value = "";
+      document.getElementById("rejectModal").classList.add("active");
+    }
+
+    function handleRejectSubmit(event) {
+      event.preventDefault();
+      const id = document.getElementById("rejectAppointmentId").value;
+      const reason = document.getElementById("rejectionReasonInput").value.trim();
+
+      const all = getAllAppointments();
+      const item = all.find(a => a.id === id);
+      if (item) {
+        item.status = "REJECTED";
+        item.rejectionReason = reason;
+        saveAllAppointments(all);
+        renderAdminTable();
+        closeModal("rejectModal");
+        showToast("Permohonan telah ditolak dengan alasan resmi.", "danger");
+      }
+    }
+
+    function directComplete(appointmentId) {
+      const all = getAllAppointments();
+      const item = all.find(a => a.id === appointmentId);
+      if (item) {
+        item.status = "COMPLETED";
+        saveAllAppointments(all);
+        renderAdminTable();
+        showToast("Pertemuan selesai.");
+      }
+    }
+
+    /* ==========================================================================
+       11. SIMULATOR CHECK-IN LOBI RESEPSIONIS
+       ========================================================================== */
+    let currentScannedTicket = null;
+
+    function handleScanTicket() {
+      const input = document.getElementById("scanTicketInput").value.trim().toUpperCase();
+      const screen = document.getElementById("scanResultScreen");
+      const all = getAllAppointments();
+      const item = all.find(a => a.ticketCode === input);
+
+      if (!item) {
+        screen.style.display = "none";
+        showToast("Kode Tiket tidak valid atau tidak terdaftar!", "danger");
+        return;
+      }
+
+      currentScannedTicket = item;
+
+      document.getElementById("scanFaceImg").src = item.faceSnapshot;
+      document.getElementById("scanTicketBadge").textContent = item.ticketCode;
+      document.getElementById("scanStatusBadge").textContent = item.status;
+      document.getElementById("scanStatusBadge").className = `badge badge-${item.status.toLowerCase()}`;
+      document.getElementById("scanGuestName").textContent = item.fullName;
+      document.getElementById("scanCategory").textContent = `Kategori: ${item.category} | No. WA: ${item.phone}`;
+      document.getElementById("scanSchedule").textContent = item.scheduledDate ? `Jadwal: ${item.scheduledDate} (${item.scheduledStart} - ${item.scheduledEnd} WIB)` : "Belum Dijadwalkan";
+      document.getElementById("scanRoom").textContent = item.room ? `Ruang: ${item.room}` : "";
+
+      const btnCheckin = document.getElementById("btnConfirmCheckin");
+      const btnCheckout = document.getElementById("btnConfirmCheckout");
+
+      btnCheckin.style.display = (item.status === "APPROVED") ? "inline-flex" : "none";
+      btnCheckout.style.display = (item.status === "CHECKED_IN") ? "inline-flex" : "none";
+
+      screen.style.display = "block";
+      showToast("Data tiket berhasil dimuat. Cocokkan wajah pengunjung.");
+    }
+
+    function confirmCheckin() {
+      if (!currentScannedTicket) return;
+      const all = getAllAppointments();
+      const item = all.find(a => a.id === currentScannedTicket.id);
+      if (item) {
+        item.status = "CHECKED_IN";
+        item.checkInAt = new Date().toLocaleString("id-ID");
+        saveAllAppointments(all);
+        handleScanTicket(); // refresh view
+        renderAdminTable();
+        showToast("Presensi Check-In Berhasil! Tamu dipersilakan menuju ruangan.");
+      }
+    }
+
+    function confirmCheckout() {
+      if (!currentScannedTicket) return;
+      const all = getAllAppointments();
+      const item = all.find(a => a.id === currentScannedTicket.id);
+      if (item) {
+        item.status = "COMPLETED";
+        saveAllAppointments(all);
+        handleScanTicket(); // refresh view
+        renderAdminTable();
+        showToast("Tamu telah Check-Out. Sesi kunjungan selesai.");
+      }
+    }
+
+    /* ==========================================================================
+       12. UTILITAS MODAL, TOAST, & SIMULASI QR CODE SVG
+       ========================================================================== */
+    function openPhotoModal(src) {
+      document.getElementById("enlargedPhoto").src = src;
+      document.getElementById("photoModal").classList.add("active");
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove("active");
+    }
+
+    function showToast(message, type = "normal") {
+      const container = document.getElementById("toastContainer");
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      if (type === "danger") toast.style.borderLeftColor = "var(--danger)";
+
+      toast.innerHTML = `<span>${type === "danger" ? "⚠️" : "🔔"}</span> <span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateX(50px)";
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // Generator SVG Pola QR Mini Dinamis tanpa pustaka eksternal
+    function renderSimpleQrSvg(containerId, text) {
+      const box = document.getElementById(containerId);
+      if (!box) return;
+
+      let hash = 0;
+      for (let i = 0; i < text.length; i++) {
+        hash = (hash << 5) - hash + text.charCodeAt(i);
+        hash |= 0;
+      }
+
+      let rects = "";
+      for (let r = 0; r < 7; r++) {
+        for (let c = 0; c < 7; c++) {
+          if ((r < 2 && c < 2) || (r > 4 && c < 2) || (r < 2 && c > 4)) {
+            rects += `<rect x="${c * 15 + 10}" y="${r * 15 + 10}" width="12" height="12" fill="#0f274a"/>`;
+          } else if ((hash & (1 << ((r * 7 + c) % 31))) !== 0) {
+            rects += `<rect x="${c * 15 + 10}" y="${r * 15 + 10}" width="12" height="12" fill="#0f274a"/>`;
+          }
+        }
+      }
+
+      box.innerHTML = `
+        <svg viewBox="0 0 125 125" width="100%" height="100%">
+          <rect width="100%" height="100%" fill="#ffffff" rx="8"/>
+          ${rects}
+        </svg>
+      `;
+    }
   </script>
 </body>
 </html>
